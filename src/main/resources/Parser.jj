@@ -1,0 +1,499 @@
+options {
+    LOOKAHEAD = 2;
+    STATIC = false;
+}
+
+PARSER_BEGIN(Parser)
+package com.sapog87.visual_novel.core.parser;
+
+import java.util.*;
+
+public class Parser {}
+
+/*
+abstract class Expr {
+    public abstract void visit(Visitor v);
+}
+
+abstract class Val extends Expr {
+    Object value;
+    Val(Object value) { this.value = value; }
+    public String toString() { return String.valueOf(value); }
+}
+
+class Id extends Val {
+    Id(String v) {super(v);}
+
+    @Override
+    public void visit(Visitor v) {
+        v.visitId(this);
+    }
+}
+
+class MyString extends Val {
+    MyString(String v) {super(v);}
+
+    @Override
+    public void visit(Visitor v) {
+        v.visitString(this);
+    }
+}
+
+class Bool extends Val {
+    Bool(Boolean v) {super(v);}
+
+    @Override
+    public void visit(Visitor v) {
+        v.visitBool(this);
+    }
+}
+
+abstract class Num extends Val {
+    Num(Object value) {super(value);}
+}
+
+class Int extends Num {
+    Int(Integer v) {super(v);}
+
+    @Override
+    public void visit(Visitor v) {
+        v.visitInt(this);
+    }
+}
+
+class Real extends Num {
+    Real(Double v) {super(v);}
+
+    @Override
+    public void visit(Visitor v) {
+        v.visitReal(this);
+    }
+}
+
+class BinaryExpr extends Expr {
+    String op;
+    Expr left, right;
+    BinaryExpr(String o, Expr l, Expr r) {op = o; left = l; right = r;}
+    public String toString() {return "(" + op + " " + left + " " + right + ")";}
+
+    @Override
+    public void visit(Visitor v) {
+        v.visitBinaryExpr(this);
+    }
+}
+
+class AssignExpr extends Expr {
+    Expr id;
+    Expr expr;
+    String op;
+    AssignExpr(Expr id, Expr expr, String op) {this.id = id; this.expr = expr; this.op = op;}
+    public String toString() {return id + " " + op + " " + expr;}
+
+    @Override
+    public void visit(Visitor v) {
+        v.visitAssignExpr(this);
+    }
+}
+
+abstract class Visitor {
+    void visitId(Id id) {}
+    void visitInt(Int num) {}
+    void visitReal(Real num) {}
+    void visitBool(Bool bool) {}
+    void visitString(MyString str) {}
+    void visitBinaryExpr(BinaryExpr binaryExpr) {}
+    void visitAssignExpr(AssignExpr assignExpr) {}
+}
+
+enum SemanticType {
+    STRING,
+    REAL,
+    INT,
+    BOOL,
+}
+
+abstract class SemanticCheckVisitor extends Visitor {
+    Set<String> arithmeticOperations = new HashSet<String>(List.of("+", "-", "*", "/", "%"));
+    Set<String> logicalOperations = new HashSet<String>(List.of("&&", "||"));
+    Set<String> compareOperations = new HashSet<String>(List.of(">", "<", ">=", "<=", "==", "!="));
+
+    Map<String, SemanticType> symTable;
+
+    SemanticCheckVisitor(Map<String, SemanticType> symTable) {
+        this.symTable = symTable;
+    }
+
+    SemanticType calcType(Expr expr) {
+        if (expr instanceof Id) {
+            Id id = (Id)expr;
+            if (!symTable.containsKey(id.value)) {
+                throw new IllegalArgumentException("identifier {" + id + "} not defined");
+            }
+            return symTable.get(id.value);
+        }
+        else if (expr instanceof BinaryExpr) {
+            BinaryExpr binaryExpr = (BinaryExpr)expr;
+            var left = calcType(binaryExpr.left);
+            var right = calcType(binaryExpr.right);
+
+            if (arithmeticOperations.contains(binaryExpr.op)) {
+                if ((left.equals(SemanticType.REAL) || left.equals(SemanticType.INT)) && (right.equals(SemanticType.REAL) || right.equals(SemanticType.INT))) {
+                    if(left.equals(right)) {
+                        return left;
+                    }
+                    else {
+                        return SemanticType.REAL;
+                    }
+                }
+                else {
+                    throw new IllegalArgumentException("unsupported operation {" + binaryExpr.op + "} for types: {" + left + "} and {" + right + "}");
+                }
+            }
+            else if (logicalOperations.contains(binaryExpr.op)) {
+                if (!left.equals(SemanticType.BOOL) || !right.equals(SemanticType.BOOL)) {
+                    throw new IllegalArgumentException("unsupported operation {" + binaryExpr.op + "} for types: {" + left + "} and {" + right + "}");
+                }
+                return SemanticType.BOOL;
+            }
+            else if(compareOperations.contains(binaryExpr.op)){
+                if ((left.equals(SemanticType.REAL) || left.equals(SemanticType.INT)) && (right.equals(SemanticType.REAL) || right.equals(SemanticType.INT))) {
+                    return SemanticType.BOOL;
+                }
+                else if(left.equals(SemanticType.STRING) && right.equals(SemanticType.STRING) || left.equals(SemanticType.BOOL) && right.equals(SemanticType.BOOL)){
+                    if (binaryExpr.op.equals("==") || binaryExpr.op.equals("!=")) {
+                        return SemanticType.BOOL;
+                    }
+                    else {
+                        throw new IllegalArgumentException("unsupported operation {" + binaryExpr.op + "} for types: {" + left + "} and {" + right + "}");
+                    }
+                }
+                else {
+                    throw new IllegalArgumentException("unsupported operation {" + binaryExpr.op + "} for types: {" + left + "} and {" + right + "}");
+                }
+            }
+            else {
+                throw new IllegalArgumentException("unknown operation");
+            }
+        }
+        else if (expr instanceof MyString){
+            return SemanticType.STRING;
+        }
+        else if (expr instanceof Int){
+            return SemanticType.INT;
+        }
+        else if (expr instanceof Real){
+            return SemanticType.REAL;
+        }
+        else if (expr instanceof Bool){
+            return SemanticType.BOOL;
+        }
+        else {
+            throw new IllegalArgumentException("unknown type");
+        }
+    }
+}
+
+class SemanticCheckForConditionVisitor extends SemanticCheckVisitor {
+    SemanticCheckForConditionVisitor(Map<String, SemanticType> symTable) {
+        super(symTable);
+    }
+
+    @Override
+    void visitAssignExpr(AssignExpr assignExpr) {
+        throw new IllegalArgumentException("unknown operation");
+    }
+
+    @Override
+    void visitBinaryExpr(BinaryExpr binaryExpr) {
+        var type = calcType(binaryExpr);
+        if (!type.equals(SemanticType.BOOL)) {
+            throw new IllegalArgumentException("found {" + type + "} expected {Bool}");
+        }
+    }
+
+    @Override
+    void visitId(Id id) {
+        var type = calcType(id);
+        if (!type.equals(SemanticType.BOOL)) {
+            throw new IllegalArgumentException("found {" + type + "} expected {Bool}");
+        }
+    }
+
+    @Override
+    void visitInt(Int num) {
+        throw new IllegalArgumentException("found {Int} expected {Bool}");
+    }
+
+    @Override
+    void visitReal(Real num) {
+        throw new IllegalArgumentException("found {Real} expected {Bool}");
+    }
+
+    @Override
+    void visitString(MyString str) {
+        throw new IllegalArgumentException("found {String} expected {Bool}");
+    }
+}
+
+class SemanticCheckForAssignVisitor extends SemanticCheckVisitor {
+    SemanticCheckForAssignVisitor(Map<String, SemanticType> symTable) {
+        super(symTable);
+    }
+
+    @Override
+    void visitAssignExpr(AssignExpr assignExpr) {
+        var typeOfId = calcType(assignExpr.id);
+        var typeOfExpr = calcType(assignExpr.expr);
+        var typeOfAssign = assignExpr.op;
+
+        switch (typeOfAssign) {
+            case "=":
+                if ((typeOfId == SemanticType.BOOL && typeOfExpr != SemanticType.BOOL) ||
+                        (typeOfId == SemanticType.STRING && typeOfExpr != SemanticType.STRING) ||
+                        (typeOfId == SemanticType.INT && typeOfExpr != SemanticType.INT) ||
+                        (typeOfId == SemanticType.REAL && typeOfExpr != SemanticType.INT && typeOfExpr != SemanticType.REAL)) {
+                    throw new IllegalArgumentException("Operator {" + typeOfAssign + "} cannot be applied to Id: {" + typeOfId + "}, Expr {" + typeOfExpr + "}");
+                }
+                break;
+            case "&=":
+            case "|=":
+                if ((typeOfId == SemanticType.REAL || typeOfExpr == SemanticType.REAL) ||
+                        (typeOfId == SemanticType.STRING || typeOfExpr == SemanticType.STRING) ||
+                        (typeOfId != typeOfExpr)) {
+                    throw new IllegalArgumentException("Operator {" + typeOfAssign + "} cannot be applied to Id: {" + typeOfId + "}, Expr {" + typeOfExpr + "}");
+                }
+                break;
+            case "+=":
+            case "-=":
+            case "*=":
+            case "/=":
+            case "%=":
+                if ((typeOfId == SemanticType.BOOL || typeOfExpr == SemanticType.BOOL) ||
+                        (typeOfId == SemanticType.STRING || typeOfExpr == SemanticType.STRING)) {
+                    throw new IllegalArgumentException("Operator {" + typeOfAssign + "} cannot be applied to Id: {" + typeOfId + "}, Expr {" + typeOfExpr + "}");
+                }
+                break;
+        }
+    }
+}
+*/
+
+PARSER_END(Parser)
+
+SKIP: {
+    " " | "\t" | "\n" | "\r"
+}
+
+TOKEN: {
+    <#ALPHA: ["a"-"z","A"-"Z","_"]>
+    | <#DIGIT: ["0"-"9"]>
+    | <#ALPHADIGIT: <ALPHA>|<DIGIT>>
+    | <INT:  (<DIGIT>)+>
+    | <REAL: (<DIGIT>)+"."(<DIGIT>)+>
+    | <TRUE: "true">
+    | <FALSE: "false">
+    | <ID: (<ALPHA>)(<ALPHADIGIT>)*>
+    | <GT: ">">
+    | <LT: "<">
+    | <GEQ: ">=">
+    | <LEQ: "<=">
+    | <NEQ: "!=">
+    | <EQ: "==">
+    | <AND: "&&">
+    | <OR: "||">
+    | <LPAREN: "(">
+    | <RPAREN: ")">
+    | <PLUS: "+">
+    | <MINUS: "-">
+    | <MULTIPLY: "*">
+    | <DIVIDE: "/">
+    | <MOD: "%">
+    | <QUOTE:"\""> : STRING_STATE
+    | <ASSIGNMENT: "=">
+    | <DASSIGNMENT: "/=">
+    | <MASSIGNMENT: "*=">
+    | <ORASSIGNMENT: "|=">
+    | <ANDASSIGNMENT: "&=">
+    | <MODASSIGNMENT: "%=">
+    | <PLUSASSIGNMENT: "+=">
+    | <MINUSASSIGNMENT: "-=">
+}
+
+<STRING_STATE> MORE:
+{
+  "\\" : ESC_STATE
+}
+
+<STRING_STATE> TOKEN:
+{
+  <ENDQUOTE: <QUOTE>> : DEFAULT
+  | <CHAR: ~["\"","\\"]>
+}
+
+<ESC_STATE> TOKEN:
+{
+  <CNTRL_ESC: ["\"","\\","/","b","f","n","r","t"]> : STRING_STATE
+}
+
+Expr SC(): { Expr expr; }
+{
+  expr = A() { return expr; }
+}
+
+Expr SA(): { Expr id, expr, result; }
+{
+    id = Id() (<ASSIGNMENT> expr = A() {result = new AssignExpr(id, expr,"=");}
+              | <MINUSASSIGNMENT> expr = A() {result = new AssignExpr(id, expr,"-=");}
+              | <PLUSASSIGNMENT> expr = A() {result = new AssignExpr(id, expr,"+=");}
+              | <MASSIGNMENT> expr = A() {result = new AssignExpr(id, expr,"*=");}
+              | <DASSIGNMENT> expr = A() {result = new AssignExpr(id, expr,"/=");}
+              | <ORASSIGNMENT> expr = A() {result = new AssignExpr(id, expr,"|=");}
+              | <ANDASSIGNMENT> expr = A() {result = new AssignExpr(id, expr,"&=");}
+              | <MODASSIGNMENT> expr = A() {result = new AssignExpr(id, expr,"%=");})
+    {return result;}
+}
+
+Expr A() : { Expr expr1, expr2; }
+{
+  expr1 = B() (<OR> expr2 = B() {expr1 = new BinaryExpr("||", expr1, expr2);})*
+  { return expr1; }
+}
+
+Expr B() : { Expr expr1, expr2; }
+{
+  expr1 = C() (<AND> expr2 = C() {expr1 = new BinaryExpr("&&", expr1, expr2);})*
+  { return expr1; }
+}
+
+Expr C() : { Expr expr1, expr2; }
+{
+  expr1 = D() (<EQ> expr2 = D() {expr1 = new BinaryExpr("==", expr1, expr2);}
+              |<NEQ> expr2 = D() {expr1 = new BinaryExpr("!=", expr1, expr2);})*
+  { return expr1; }
+}
+
+Expr D() : { Expr expr1, expr2; }
+{
+  expr1 = E() (<GEQ> expr2 = E() {expr1 = new BinaryExpr(">=", expr1, expr2);}
+              |<GT> expr2 = E() {expr1 = new BinaryExpr(">", expr1, expr2);}
+              |<LEQ> expr2 = E() {expr1 = new BinaryExpr("<=", expr1, expr2);}
+              |<LT> expr2 = E() {expr1 = new BinaryExpr("<", expr1, expr2);})*
+  { return expr1; }
+}
+
+Expr E() : { Expr expr1, expr2; }
+{
+  expr1 = F() (<PLUS> expr2 = F() {expr1 = new BinaryExpr("+", expr1, expr2);}
+              |<MINUS> expr2 = F() {expr1 = new BinaryExpr("-", expr1, expr2);})*
+  { return expr1; }
+}
+
+Expr F() : { Expr expr1, expr2; }
+{
+  expr1 = G() (<MULTIPLY> expr2 = G() {expr1 = new BinaryExpr("*", expr1, expr2);}
+              |<DIVIDE> expr2 = G() {expr1 = new BinaryExpr("/", expr1, expr2);}
+              |<MOD> expr2 = G() {expr1 = new BinaryExpr("%", expr1, expr2);})*
+  { return expr1; }
+}
+
+Expr G(): { Expr expr; }
+{
+  expr = Num() { return expr; }
+  | expr = Id() { return expr; }
+  | expr = Bool() { return expr; }
+  | expr = MyString() { return expr; }
+  | <LPAREN> expr = A() <RPAREN> { return expr; }
+}
+
+Expr Num(): { Expr number; }
+{
+    number = Int() { return number; }
+    | number = Real() { return number; }
+}
+
+Expr Int(): { Token number; }
+{
+    number = <INT> { return new Int(Integer.parseInt(number.image)); }
+    | <MINUS> number = <INT> { return new Int(-Integer.parseInt(number.image)); }
+    | <PLUS> number = <INT> { return new Int(Integer.parseInt(number.image)); }
+}
+
+Expr Real(): { Token number; }
+{
+    number = <REAL> { return new Real(Double.parseDouble(number.image)); }
+    | <MINUS> number = <REAL> { return new Real(-Double.parseDouble(number.image)); }
+    | <PLUS> number = <REAL> { return new Real(Double.parseDouble(number.image)); }
+}
+
+Expr Id(): { Token id; }
+{
+    id = <ID> { return new Id(id.image); }
+}
+
+Expr MyString(): { StringBuilder builder = new StringBuilder(); }
+{
+   <QUOTE> ( getChar(builder) )* <ENDQUOTE> {return new MyString(builder.toString());}
+}
+
+void getChar(StringBuilder builder):
+{
+  Token t;
+}
+{
+  ( t = <CHAR> | t = <CNTRL_ESC> )
+  {
+    if (t.image.length() < 2)
+    {
+      // CHAR
+      builder.append(t.image.charAt(0));
+    }
+    else if (t.image.length() < 6)
+    {
+      // ESC
+      char c = t.image.charAt(1);
+      switch (c)
+      {
+        case 'b': builder.append((char) 8); break;
+        case 'f': builder.append((char) 12); break;
+        case 'n': builder.append((char) 10); break;
+        case 'r': builder.append((char) 13); break;
+        case 't': builder.append((char) 9); break;
+        default: builder.append(c);
+      }
+    }
+  }
+}
+
+Expr Bool(): { Token bool; }
+{
+    bool = <TRUE> { return new Bool(true); }
+    | bool = <FALSE> { return new Bool(false); }
+}
+
+Expr semanticCheckForCondition(Map<String, SemanticType> semanticTypeMap):
+{
+    Expr expr;
+    SemanticCheckForConditionVisitor visitor = new SemanticCheckForConditionVisitor(semanticTypeMap);
+}
+{
+  expr = SC()
+  {
+    System.out.println(expr);
+    expr.visit(visitor);
+    return expr;
+  }
+}
+
+Expr semanticCheckForAssign(Map<String, SemanticType> semanticTypeMap):
+{
+    Expr expr;
+    SemanticCheckForAssignVisitor visitor = new SemanticCheckForAssignVisitor(semanticTypeMap);
+}
+{
+  expr = SA()
+  {
+    System.out.println(expr);
+    expr.visit(visitor);
+    return expr;
+  }
+}
