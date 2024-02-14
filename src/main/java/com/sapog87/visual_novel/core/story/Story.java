@@ -5,7 +5,8 @@ import com.sapog87.visual_novel.core.json.Node;
 import com.sapog87.visual_novel.core.json.Root;
 import com.sapog87.visual_novel.core.parser.SemanticType;
 import com.sapog87.visual_novel.core.story.nodes.*;
-import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -13,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 public class Story {
+    private final Logger logger = LoggerFactory.getLogger(Story.class);
     private final Map<String, StoryNode> story;
     private final Map<String, VariableInfo> variables;
 
@@ -64,6 +66,7 @@ public class Story {
         }
         toVariables(variableStoryNodes);
         validateWholeStory();
+        logger.info("Successful tree building");
     }
 
     private void toVariables(List<VariableStoryNode> variableStoryNodes) {

@@ -366,7 +366,6 @@ public class Parser implements ParserConstants {
     Expr expr;
     SemanticCheckForConditionVisitor visitor = new SemanticCheckForConditionVisitor(semanticTypeMap);
     expr = SC();
-    System.out.println(expr);
     expr.visit(visitor);
     {if (true) return expr;}
     throw new Error("Missing return statement in function");
@@ -376,7 +375,6 @@ public class Parser implements ParserConstants {
     Expr expr;
     SemanticCheckForAssignVisitor visitor = new SemanticCheckForAssignVisitor(semanticTypeMap);
     expr = SA();
-    System.out.println(expr);
     expr.visit(visitor);
     {if (true) return expr;}
     throw new Error("Missing return statement in function");
@@ -681,17 +679,6 @@ public class Parser implements ParserConstants {
     try { return !jj_3_43(); }
     catch(LookaheadSuccess ls) { return true; }
     finally { jj_save(42, xla); }
-  }
-
-  private boolean jj_3R_11() {
-    if (jj_3R_12()) return true;
-    return false;
-  }
-
-  private boolean jj_3_10() {
-    if (jj_scan_token(AND)) return true;
-    if (jj_3R_10()) return true;
-    return false;
   }
 
   private boolean jj_3R_17() {
@@ -1074,6 +1061,17 @@ public class Parser implements ParserConstants {
     return false;
   }
 
+  private boolean jj_3R_11() {
+    if (jj_3R_12()) return true;
+    return false;
+  }
+
+  private boolean jj_3_10() {
+    if (jj_scan_token(AND)) return true;
+    if (jj_3R_10()) return true;
+    return false;
+  }
+
   /** Generated Token Manager. */
   public ParserTokenManager token_source;
   SimpleCharStream jj_input_stream;
@@ -1405,4 +1403,3 @@ public class Parser implements ParserConstants {
   }
 
                      }
-

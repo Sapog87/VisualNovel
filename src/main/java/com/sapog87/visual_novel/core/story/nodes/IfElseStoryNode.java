@@ -1,10 +1,7 @@
 package com.sapog87.visual_novel.core.story.nodes;
 
-import com.sapog87.visual_novel.core.parser.ParseException;
-import com.sapog87.visual_novel.core.parser.Parser;
-import com.sapog87.visual_novel.core.parser.SemanticType;
+import com.sapog87.visual_novel.core.parser.*;
 import com.sapog87.visual_novel.core.story.VariableInfo;
-import org.jetbrains.annotations.NotNull;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -12,6 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class IfElseStoryNode extends StoryNode {
+    private Expr expr;
     public IfElseStoryNode(StoryNode node, Map<String, VariableInfo> variables) {
         super(node, variables);
     }
@@ -33,7 +31,7 @@ public class IfElseStoryNode extends StoryNode {
         Map<String, SemanticType> semanticTypeMap = getSemanticTypeMap();
 
         try {
-            parser.semanticCheckForCondition(semanticTypeMap);
+            expr = parser.semanticCheckForCondition(semanticTypeMap);
         } catch (ParseException e) {
             throw new IllegalArgumentException(e);
         }

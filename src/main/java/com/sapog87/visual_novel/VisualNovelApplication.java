@@ -1,18 +1,10 @@
 package com.sapog87.visual_novel;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pengrad.telegrambot.TelegramBot;
-import com.sapog87.visual_novel.core.json.JsonParser;
-import com.sapog87.visual_novel.core.json.Root;
-import com.sapog87.visual_novel.core.parser.Parser;
-import com.sapog87.visual_novel.core.story.Story;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
-
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.InputStream;
 
 @SpringBootApplication
 public class VisualNovelApplication {
@@ -23,13 +15,9 @@ public class VisualNovelApplication {
     }
 
     public static void main(String[] args) {
-        File file = new File("stories/story.json");
-        JsonParser jsonParser = new JsonParser(file, new ObjectMapper());
-        Root root = jsonParser.parse();
-        Story story = new Story(root);
+        SpringApplication.run(VisualNovelApplication.class, args);
 
         /*
-        var context = SpringApplication.run(VisualNovelApplication.class, args);
         TelegramBot bot = (TelegramBot) context.getBean("telegramBot");
         System.out.println(bot.getToken());
 

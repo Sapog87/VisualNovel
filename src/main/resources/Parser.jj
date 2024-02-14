@@ -478,7 +478,6 @@ Expr semanticCheckForCondition(Map<String, SemanticType> semanticTypeMap):
 {
   expr = SC()
   {
-    System.out.println(expr);
     expr.visit(visitor);
     return expr;
   }
@@ -492,7 +491,6 @@ Expr semanticCheckForAssign(Map<String, SemanticType> semanticTypeMap):
 {
   expr = SA()
   {
-    System.out.println(expr);
     expr.visit(visitor);
     return expr;
   }

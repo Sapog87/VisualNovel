@@ -640,7 +640,7 @@
           "data": {
             "type": "double",
             "name": "a",
-            "value": "10"
+            "value": "10.0"
           },
           "class": "variable",
           "html": "\n <div>\n <div class=\"title-box\">Variable</div>\n <div class=\"box\">\n <p>Select variable type</p>\n <select df-type>\n <option value=\"string\">String</option>\n <option value=\"int\">Integer</option>\n <option value=\"double\">Double</option>\n <option value=\"bool\">Boolean</option>\n </select>\n <p>Enter variable name</p>\n <input type=\"text\" df-name>\n <p>Enter starting value</p>\n <input type=\"text\" df-value>\n </div>\n </div>\n </div>\n ",
