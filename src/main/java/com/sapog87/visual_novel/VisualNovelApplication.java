@@ -16,38 +16,6 @@ public class VisualNovelApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(VisualNovelApplication.class, args);
-
-        /*
-        TelegramBot bot = (TelegramBot) context.getBean("telegramBot");
-        System.out.println(bot.getToken());
-
-        bot.setUpdatesListener(updates -> {
-
-            updates.forEach(x -> {
-                Long id = x.message().from().id();
-                System.out.println(id);
-
-                InlineKeyboardButton keyboardButton = new InlineKeyboardButton("fffrr");
-                keyboardButton.webApp(new WebAppInfo("https://www.youtube.com"));
-                InlineKeyboardMarkup keyboard = new InlineKeyboardMarkup(keyboardButton);
-
-                Keyboard replyKeyboardRemove = new ReplyKeyboardRemove();
-                SendMessage request = new SendMessage(id, "let's start")
-                        .replyMarkup(keyboard);
-
-                bot.execute(request);
-            });
-
-            return UpdatesListener.CONFIRMED_UPDATES_ALL;
-        }, e -> {
-            if (e.response() != null) {
-                e.response().errorCode();
-                e.response().description();
-            } else {
-                e.printStackTrace();
-            }
-        });
-        */
     }
 
 }

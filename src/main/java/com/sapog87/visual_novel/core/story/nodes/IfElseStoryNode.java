@@ -10,6 +10,7 @@ import java.util.Map;
 
 public class IfElseStoryNode extends StoryNode {
     private Expr expr;
+
     public IfElseStoryNode(StoryNode node, Map<String, VariableInfo> variables) {
         super(node, variables);
     }
@@ -48,5 +49,11 @@ public class IfElseStoryNode extends StoryNode {
         for (var x : getVariables().entrySet())
             semanticTypeMap.put(x.getKey(), x.getValue().getType());
         return semanticTypeMap;
+    }
+
+    public Boolean compute(Map<String, VariableInfo> variables) {
+        CalculationVisitor visitor = new CalculationVisitor(variables);
+        expr.visit(visitor);
+        return (Boolean) visitor.getResult();
     }
 }

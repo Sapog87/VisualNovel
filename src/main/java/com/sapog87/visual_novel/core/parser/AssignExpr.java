@@ -1,5 +1,8 @@
 package com.sapog87.visual_novel.core.parser;
 
+import lombok.Getter;
+
+@Getter
 public class AssignExpr extends Expr {
     Expr id;
     Expr expr;

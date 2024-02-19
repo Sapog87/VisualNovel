@@ -5,4 +5,5 @@ public enum SemanticType {
     REAL,
     INT,
     BOOL,
+    UNDEF
 }

@@ -23,5 +23,5 @@ public class Variable {
 
     @ManyToOne
     @JoinColumn(name="user_id", nullable=false)
-    private VNUser user;
+    private User user;
 }

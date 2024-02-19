@@ -5,6 +5,7 @@ import com.sapog87.visual_novel.core.json.Node;
 import com.sapog87.visual_novel.core.json.Root;
 import com.sapog87.visual_novel.core.parser.SemanticType;
 import com.sapog87.visual_novel.core.story.nodes.*;
+import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,7 +17,48 @@ import java.util.Map;
 public class Story {
     private final Logger logger = LoggerFactory.getLogger(Story.class);
     private final Map<String, StoryNode> story;
+    @Getter
     private final Map<String, VariableInfo> variables;
+    @Getter
+    private String startNodeId;
+
+    public Story(Root root) {
+        story = new HashMap<>();
+        variables = new HashMap<>();
+        List<VariableStoryNode> variableStoryNodes = new ArrayList<>();
+        var treeNodes = root.getDrawflow().getHome().getData();
+        for (var treeNode : treeNodes.entrySet()) {
+            if (!story.containsKey(treeNode.getKey())) {
+                Node node = treeNode.getValue();
+                StoryNode storyNode = toStoryNode(node);
+                if (storyNode instanceof VariableStoryNode variableStoryNode) {
+                    variableStoryNodes.add(variableStoryNode);
+                } else {
+                    if (storyNode instanceof StartStoryNode) {
+                        startNodeId = treeNode.getKey();
+                    }
+                    story.put(treeNode.getKey(), storyNode);
+                }
+            }
+        }
+        toVariables(variableStoryNodes);
+        validateWholeStory();
+        logger.info("Successful tree building");
+    }
+
+    public StoryNode getNodeById(String id) {
+        return story.get(id);
+    }
+
+    public static SemanticType getSemanticType(String t) {
+        return switch (t) {
+            case "string" -> SemanticType.STRING;
+            case "int" -> SemanticType.INT;
+            case "double" -> SemanticType.REAL;
+            case "bool" -> SemanticType.BOOL;
+            default -> throw new IllegalStateException("Unexpected value: " + t);
+        };
+    }
 
     private void validateWholeStory() {
         boolean hasStart = false;
@@ -48,27 +90,6 @@ public class Story {
         }
     }
 
-    public Story(Root root) {
-        story = new HashMap<>();
-        variables = new HashMap<>();
-        List<VariableStoryNode> variableStoryNodes = new ArrayList<>();
-        var treeNodes = root.getDrawflow().getHome().getData();
-        for (var treeNode : treeNodes.entrySet()) {
-            if (!story.containsKey(treeNode.getKey())) {
-                Node node = treeNode.getValue();
-                StoryNode storyNode = toStoryNode(node);
-                if (storyNode instanceof VariableStoryNode variableStoryNode) {
-                    variableStoryNodes.add(variableStoryNode);
-                } else {
-                    story.put(treeNode.getKey(), storyNode);
-                }
-            }
-        }
-        toVariables(variableStoryNodes);
-        validateWholeStory();
-        logger.info("Successful tree building");
-    }
-
     private void toVariables(List<VariableStoryNode> variableStoryNodes) {
         for (VariableStoryNode node : variableStoryNodes) {
             node.validate();
@@ -84,20 +105,11 @@ public class Story {
                 case REAL -> Double.valueOf(v);
                 case INT -> Integer.valueOf(v);
                 case BOOL -> Boolean.valueOf(v);
+                case UNDEF -> null;
             };
 
             variables.put(name, new VariableInfo(name, value, semanticType));
         }
-    }
-
-    public static SemanticType getSemanticType(String t) {
-        return switch (t) {
-            case "string" -> SemanticType.STRING;
-            case "int" -> SemanticType.INT;
-            case "double" -> SemanticType.REAL;
-            case "bool" -> SemanticType.BOOL;
-            default -> throw new IllegalStateException("Unexpected value: " + t);
-        };
     }
 
     private StoryNode toStoryNode(Node node) {

@@ -148,7 +148,86 @@ public class CalculationVisitor extends Visitor {
 
     @Override
     void visitAssignExpr(AssignExpr assignExpr) {
-        throw new IllegalArgumentException("unknown operation");
+        assignExpr.id.visit(this);
+        Object id = result;
+        assignExpr.expr.visit(this);
+        Object expr = result;
 
+        String op = assignExpr.op;
+        if (id instanceof Integer integer1) {
+            if (expr instanceof Integer integer2) {
+                switch (op) {
+                    case "=" -> result = integer2;
+                    case "-=" -> result = integer1 - integer2;
+                    case "+=" -> result = integer1 + integer2;
+                    case "*=" -> result = integer1 * integer2;
+                    case "/=" -> result = integer1 / integer2;
+                    case "|=" -> result = integer1 | integer2;
+                    case "&=" -> result = integer1 & integer2;
+                    case "%=" -> result = integer1 % integer2;
+                    default -> throw new IllegalArgumentException("unknown operation");
+                }
+            } else if (expr instanceof Double real2) {
+                switch (op) {
+                    case "=" -> result = real2;
+                    case "-=" -> result = integer1 - real2;
+                    case "+=" -> result = integer1 + real2;
+                    case "*=" -> result = integer1 * real2;
+                    case "/=" -> result = integer1 / real2;
+                    case "%=" -> result = integer1 % real2;
+                    default -> throw new IllegalArgumentException("unknown operation");
+                }
+            } else {
+                //TODO
+                throw new IllegalArgumentException("nope");
+            }
+        } else if (id instanceof Double real1) {
+            if (expr instanceof Integer integer2) {
+                switch (op) {
+                    case "=" -> result = integer2;
+                    case "-=" -> result = real1 - integer2;
+                    case "+=" -> result = real1 + integer2;
+                    case "*=" -> result = real1 * integer2;
+                    case "/=" -> result = real1 / integer2;
+                    case "%=" -> result = real1 % integer2;
+                    default -> throw new IllegalArgumentException("unknown operation");
+                }
+            } else if (expr instanceof Double real2) {
+                switch (op) {
+                    case "=" -> result = real2;
+                    case "-=" -> result = real1 - real2;
+                    case "+=" -> result = real1 + real2;
+                    case "*=" -> result = real1 * real2;
+                    case "/=" -> result = real1 / real2;
+                    case "%=" -> result = real1 % real2;
+                    default -> throw new IllegalArgumentException("unknown operation");
+                }
+            } else {
+                //TODO
+                throw new IllegalArgumentException("nope");
+            }
+        } else if (id instanceof String str1) {
+            if (expr instanceof String str2) {
+                switch (op) {
+                    case "=" -> result = str2;
+                    default -> throw new IllegalArgumentException("unknown operation");
+                }
+            } else {
+                //TODO
+                throw new IllegalArgumentException("nope");
+            }
+        } else if (id instanceof Boolean bool1) {
+            if (expr instanceof Boolean bool2) {
+                switch (op) {
+                    case "=" -> result = bool2;
+                    case "|=" -> result = bool1 || bool2;
+                    case "&=" -> result = bool1 && bool2;
+                    default -> throw new IllegalArgumentException("unknown operation");
+                }
+            } else {
+                //TODO
+                throw new IllegalArgumentException("nope");
+            }
+        }
     }
 }

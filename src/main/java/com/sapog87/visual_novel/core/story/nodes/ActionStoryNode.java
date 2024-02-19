@@ -1,8 +1,6 @@
 package com.sapog87.visual_novel.core.story.nodes;
 
-import com.sapog87.visual_novel.core.parser.ParseException;
-import com.sapog87.visual_novel.core.parser.Parser;
-import com.sapog87.visual_novel.core.parser.SemanticType;
+import com.sapog87.visual_novel.core.parser.*;
 import com.sapog87.visual_novel.core.story.VariableInfo;
 
 import java.io.ByteArrayInputStream;
@@ -11,6 +9,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ActionStoryNode extends StoryNode {
+    private Expr expr;
+
     public ActionStoryNode(StoryNode node, Map<String, VariableInfo> variables) {
         super(node, variables);
     }
@@ -35,7 +35,7 @@ public class ActionStoryNode extends StoryNode {
         Map<String, SemanticType> semanticTypeMap = getSemanticTypeMap();
 
         try {
-            parser.semanticCheckForAssign(semanticTypeMap);
+            expr = parser.semanticCheckForAssign(semanticTypeMap);
         } catch (ParseException e) {
             throw new IllegalArgumentException(e);
         }
@@ -52,5 +52,12 @@ public class ActionStoryNode extends StoryNode {
         for (var x : getVariables().entrySet())
             semanticTypeMap.put(x.getKey(), x.getValue().getType());
         return semanticTypeMap;
+    }
+
+    public VariableInfo compute(Map<String, VariableInfo> variables) {
+        CalculationVisitor visitor = new CalculationVisitor(variables);
+        expr.visit(visitor);
+        String name = (String) ((Id) ((AssignExpr) expr).getId()).getValue();
+        return new VariableInfo(name, visitor.getResult(), SemanticType.UNDEF);
     }
 }

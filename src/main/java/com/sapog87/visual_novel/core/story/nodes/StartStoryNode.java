@@ -26,5 +26,10 @@ public class StartStoryNode extends StoryNode {
         if (!getData().containsKey("picture")) {
             throw new IllegalArgumentException("node must have {picture} field");
         }
+        for (String id : getNext().get(0)) {
+            if (!getStory().get(id).getNodeType().equals(NodeType.BUTTON)) {
+                throw new IllegalArgumentException("all outputs of node must be buttons");
+            }
+        }
     }
 }
