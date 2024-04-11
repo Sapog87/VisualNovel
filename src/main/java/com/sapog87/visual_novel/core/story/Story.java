@@ -46,18 +46,53 @@ public class Story {
         logger.info("Successful tree building");
     }
 
-    public StoryNode getNodeById(String id) {
-        return story.get(id);
+    private StoryNode toStoryNode(Node node) {
+        NodeType type = NodeType.valueOf(node.getMyClass().toUpperCase());
+        StoryNode storyNode = new StoryNode();
+        storyNode.setStory(story);
+        storyNode.setNodeType(type);
+        for (var output : node.getOutputs().entrySet()) {
+            List<String> ids = new ArrayList<>();
+            for (Connection connection : output.getValue().getConnections()) {
+                String id = connection.getNode();
+                ids.add(id);
+            }
+            storyNode.getNext().add(ids);
+        }
+        for (var input : node.getInputs().entrySet()) {
+            List<String> ids = new ArrayList<>();
+            for (Connection connection : input.getValue().getConnections()) {
+                String id = connection.getNode();
+                ids.add(id);
+            }
+            storyNode.getPrev().add(ids);
+        }
+        storyNode.setData(node.getData());
+        return storyNodeByType(storyNode);
     }
 
-    public static SemanticType getSemanticType(String t) {
-        return switch (t) {
-            case "string" -> SemanticType.STRING;
-            case "int" -> SemanticType.INT;
-            case "double" -> SemanticType.REAL;
-            case "bool" -> SemanticType.BOOL;
-            default -> throw new IllegalStateException("Unexpected value: " + t);
-        };
+    private void toVariables(List<VariableStoryNode> variableStoryNodes) {
+        for (VariableStoryNode node : variableStoryNodes) {
+            node.validate();
+
+            String name = node.getData().get("name");
+
+            String t = node.getData().get("type");
+            SemanticType semanticType = getSemanticType(t);
+            String tt = node.getData().get("statetype");
+            Boolean permanent =  Boolean.valueOf(tt);
+
+            String v = node.getData().get("value");
+            Object value = switch (semanticType) {
+                case STRING -> String.valueOf(v);
+                case REAL -> Double.valueOf(v);
+                case INT -> Integer.valueOf(v);
+                case BOOL -> Boolean.valueOf(v);
+                case UNDEF -> null;
+            };
+
+            variables.put(name, new VariableInfo(name, value, semanticType, permanent));
+        }
     }
 
     private void validateWholeStory() {
@@ -90,55 +125,9 @@ public class Story {
         }
     }
 
-    private void toVariables(List<VariableStoryNode> variableStoryNodes) {
-        for (VariableStoryNode node : variableStoryNodes) {
-            node.validate();
-
-            String name = node.getData().get("name");
-
-            String t = node.getData().get("type");
-            SemanticType semanticType = getSemanticType(t);
-
-            String v = node.getData().get("value");
-            Object value = switch (semanticType) {
-                case STRING -> String.valueOf(v);
-                case REAL -> Double.valueOf(v);
-                case INT -> Integer.valueOf(v);
-                case BOOL -> Boolean.valueOf(v);
-                case UNDEF -> null;
-            };
-
-            variables.put(name, new VariableInfo(name, value, semanticType));
-        }
-    }
-
-    private StoryNode toStoryNode(Node node) {
-        NodeType type = NodeType.valueOf(node.getMyClass().toUpperCase());
-        StoryNode storyNode = new StoryNode();
-        storyNode.setStory(story);
-        storyNode.setNodeType(type);
-        for (var output : node.getOutputs().entrySet()) {
-            List<String> ids = new ArrayList<>();
-            for (Connection connection : output.getValue().getConnections()) {
-                String id = connection.getNode();
-                ids.add(id);
-            }
-            storyNode.getNext().add(ids);
-        }
-        for (var input : node.getInputs().entrySet()) {
-            List<String> ids = new ArrayList<>();
-            for (Connection connection : input.getValue().getConnections()) {
-                String id = connection.getNode();
-                ids.add(id);
-            }
-            storyNode.getPrev().add(ids);
-        }
-        storyNode.setData(node.getData());
-        return storyNodeByType(storyNode);
-    }
-
+    //TODO chain of responsibility with spring
     private StoryNode storyNodeByType(StoryNode node) {
-        StoryNode storyNode = null;
+        StoryNode storyNode;
         switch (node.getNodeType()) {
             case START -> storyNode = new StartStoryNode(node, variables);
             case END -> storyNode = new EndStoryNode(node, variables);
@@ -148,8 +137,23 @@ public class Story {
             case BUTTON -> storyNode = new ButtonStoryNode(node, variables);
             case IFELSE -> storyNode = new IfElseStoryNode(node, variables);
             case VARIABLE -> storyNode = new VariableStoryNode(node, variables);
+            case API -> storyNode = null; //TODO реализовать APIStoryNode
             default -> throw new IllegalArgumentException("unsupported node type");
         }
         return storyNode;
+    }
+
+    public static SemanticType getSemanticType(String t) {
+        return switch (t) {
+            case "string" -> SemanticType.STRING;
+            case "int" -> SemanticType.INT;
+            case "double" -> SemanticType.REAL;
+            case "bool" -> SemanticType.BOOL;
+            default -> throw new IllegalStateException("Unexpected value: " + t);
+        };
+    }
+
+    public StoryNode getNodeById(String id) {
+        return story.get(id);
     }
 }

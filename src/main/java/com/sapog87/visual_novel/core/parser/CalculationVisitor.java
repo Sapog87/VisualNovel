@@ -81,8 +81,7 @@ public class CalculationVisitor extends Visitor {
                     default -> throw new IllegalArgumentException("unknown operation");
                 }
             } else {
-                //TODO
-                throw new IllegalArgumentException("nope");
+                throw new IllegalArgumentException("left operand is Integer, right operand must be Integer or Double");
             }
         } else if (left instanceof Double real1) {
             if (right instanceof Integer integer2) {
@@ -116,8 +115,7 @@ public class CalculationVisitor extends Visitor {
                     default -> throw new IllegalArgumentException("unknown operation");
                 }
             } else {
-                //TODO
-                throw new IllegalArgumentException("nope");
+                throw new IllegalArgumentException("left operand is Double, right operand must be Integer or Double");
             }
         } else if (left instanceof String string1) {
             if (right instanceof String string2) {
@@ -127,8 +125,7 @@ public class CalculationVisitor extends Visitor {
                     default -> throw new IllegalArgumentException("unknown operation");
                 }
             } else {
-                //TODO
-                throw new IllegalArgumentException("nope");
+                throw new IllegalArgumentException("left operand is String, right operand must be String");
             }
         } else if (left instanceof Boolean bool1) {
             if (right instanceof Boolean bool2) {
@@ -140,9 +137,10 @@ public class CalculationVisitor extends Visitor {
                     default -> throw new IllegalArgumentException("unknown operation");
                 }
             } else {
-                //TODO
-                throw new IllegalArgumentException("nope");
+                throw new IllegalArgumentException("left operand is Boolean, right operand must be Boolean");
             }
+        } else {
+            throw new IllegalArgumentException("left operand must be String or Boolean or Integer or Double");
         }
     }
 
@@ -178,8 +176,7 @@ public class CalculationVisitor extends Visitor {
                     default -> throw new IllegalArgumentException("unknown operation");
                 }
             } else {
-                //TODO
-                throw new IllegalArgumentException("nope");
+                throw new IllegalArgumentException("variable is Integer, the assigned value must be Integer or Double");
             }
         } else if (id instanceof Double real1) {
             if (expr instanceof Integer integer2) {
@@ -203,8 +200,7 @@ public class CalculationVisitor extends Visitor {
                     default -> throw new IllegalArgumentException("unknown operation");
                 }
             } else {
-                //TODO
-                throw new IllegalArgumentException("nope");
+                throw new IllegalArgumentException("variable is Double, the assigned value must be Integer or Double");
             }
         } else if (id instanceof String str1) {
             if (expr instanceof String str2) {
@@ -213,8 +209,7 @@ public class CalculationVisitor extends Visitor {
                     default -> throw new IllegalArgumentException("unknown operation");
                 }
             } else {
-                //TODO
-                throw new IllegalArgumentException("nope");
+                throw new IllegalArgumentException("variable is String, the assigned value must be String");
             }
         } else if (id instanceof Boolean bool1) {
             if (expr instanceof Boolean bool2) {
@@ -225,9 +220,10 @@ public class CalculationVisitor extends Visitor {
                     default -> throw new IllegalArgumentException("unknown operation");
                 }
             } else {
-                //TODO
-                throw new IllegalArgumentException("nope");
+                throw new IllegalArgumentException("variable is Boolean, the assigned value must be Boolean");
             }
+        } else {
+            throw new IllegalArgumentException("variable must be String or Boolean or Integer or Double");
         }
     }
 }

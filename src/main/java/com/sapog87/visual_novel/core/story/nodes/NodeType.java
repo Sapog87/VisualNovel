@@ -9,5 +9,6 @@ public enum NodeType {
     END,
     INTERMEDIATE,
     ACTION,
-    DELAY
+    DELAY,
+    API
 }

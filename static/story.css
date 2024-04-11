@@ -1,0 +1,37 @@
+.story-image {
+    margin: 5%;
+    width: 90%;
+    height: auto;
+    align-content: center;
+}
+
+.story-button {
+    margin: 1% 5%;
+    width: 90%;
+    height: auto;
+    text-align: center;
+    align-content: center;
+    padding: 2%;
+    background-color: var(--tg-theme-button-color);
+    color: var(--tg-theme-button-text-color);
+    border-radius: 10px;
+    border: 0;
+    box-shadow: none;
+}
+
+.story-text {
+    margin: 5%;
+    width: 90%;
+    text-align: center;
+    color: var(--tg-theme-text-color);
+}
+
+.story-bg {
+    margin: 5%;
+    background-color: var(--tg-theme-bg-color);
+    border-radius: 10px;
+}
+
+.story-secondary-bg {
+    background-color: var(--tg-theme-secondary-bg-color);
+}

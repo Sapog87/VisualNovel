@@ -58,6 +58,6 @@ public class ActionStoryNode extends StoryNode {
         CalculationVisitor visitor = new CalculationVisitor(variables);
         expr.visit(visitor);
         String name = (String) ((Id) ((AssignExpr) expr).getId()).getValue();
-        return new VariableInfo(name, visitor.getResult(), SemanticType.UNDEF);
+        return new VariableInfo(name, visitor.getResult(), SemanticType.UNDEF, false);
     }
 }

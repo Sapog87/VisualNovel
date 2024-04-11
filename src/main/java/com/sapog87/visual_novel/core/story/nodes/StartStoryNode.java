@@ -1,10 +1,16 @@
 package com.sapog87.visual_novel.core.story.nodes;
 
 import com.sapog87.visual_novel.core.story.VariableInfo;
+import org.springframework.stereotype.Component;
 
 import java.util.Map;
 
-public class StartStoryNode extends StoryNode {
+@Component
+public class StartStoryNode extends TerminalNode {
+    public StartStoryNode() {
+        super();
+    }
+
     public StartStoryNode(StoryNode node, Map<String, VariableInfo> variables) {
         super(node, variables);
     }

@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="UTF-8">
+    <title>VN</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="stylesheet" type="text/css" href="story.css">
+</head>
+<body class="story-secondary-bg">
+<div class="story-bg">
+    <img class="story-image" th:src="${data.nodePicture}" alt="Node Picture"/>
+    <div class="story-text">
+        <p th:text="${data.nodeText}"></p>
+    </div>
+</div>
+<div class="story-button-list">
+    <div th:each="button : ${data.buttons}">
+        <form action="/story" method="get">
+            <input type="hidden" name="user" th:value="${userId}"/>
+            <input type="hidden" name="node" th:value="${button.getNextNodeId()}"/>
+            <button class="story-button" type="submit" th:text="${button.getText()}"></button>
+        </form>
+    </div>
+</div>
+</body>
+</html>

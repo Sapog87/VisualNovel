@@ -1,6 +1,7 @@
 package com.sapog87.visual_novel;
 
 import com.pengrad.telegrambot.TelegramBot;
+import com.sapog87.visual_novel.front.telegram.Bot;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -15,7 +16,8 @@ public class VisualNovelApplication {
     }
 
     public static void main(String[] args) {
-        SpringApplication.run(VisualNovelApplication.class, args);
+        var context = SpringApplication.run(VisualNovelApplication.class, args);
+        context.getBean(Bot.class).startStory();
     }
 
 }

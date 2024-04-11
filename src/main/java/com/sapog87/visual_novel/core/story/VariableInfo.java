@@ -10,10 +10,12 @@ public class VariableInfo {
     private String name;
     private Object value;
     private SemanticType type;
+    private Boolean permanent;
 
-    public VariableInfo(String name, Object value, SemanticType type) {
+    public VariableInfo(String name, Object value, SemanticType type, Boolean permanent) {
         this.name = name;
         this.value = value;
         this.type = type;
+        this.permanent = permanent;
     }
 }
