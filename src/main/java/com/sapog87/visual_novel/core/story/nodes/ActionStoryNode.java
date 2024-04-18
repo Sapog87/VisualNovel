@@ -8,12 +8,8 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ActionStoryNode extends StoryNode {
+public final class ActionStoryNode extends LogicalStoryNode {
     private Expr expr;
-
-    public ActionStoryNode(StoryNode node, Map<String, VariableInfo> variables) {
-        super(node, variables);
-    }
 
     @Override
     public void validate() {
@@ -29,14 +25,14 @@ public class ActionStoryNode extends StoryNode {
         if (getData().get("action").isBlank()) {
             throw new IllegalArgumentException("{action} field in node must not be empty");
         }
+        super.validate();
 
         Parser parser = getParser();
-
         Map<String, SemanticType> semanticTypeMap = getSemanticTypeMap();
 
         try {
             expr = parser.semanticCheckForAssign(semanticTypeMap);
-        } catch (ParseException e) {
+        } catch (ParseException | TokenMgrError e) {
             throw new IllegalArgumentException(e);
         }
     }
@@ -45,13 +41,6 @@ public class ActionStoryNode extends StoryNode {
         String initialString = getData().get("action");
         InputStream targetStream = new ByteArrayInputStream(initialString.getBytes());
         return new Parser(targetStream);
-    }
-
-    private Map<String, SemanticType> getSemanticTypeMap() {
-        Map<String, SemanticType> semanticTypeMap = new HashMap<>();
-        for (var x : getVariables().entrySet())
-            semanticTypeMap.put(x.getKey(), x.getValue().getType());
-        return semanticTypeMap;
     }
 
     public VariableInfo compute(Map<String, VariableInfo> variables) {

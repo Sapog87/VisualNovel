@@ -6,7 +6,7 @@ options {
 PARSER_BEGIN(Parser)
 package com.sapog87.visual_novel.core.parser;
 
-import java.util.*;
+import java.util.Map;
 
 public class Parser {}
 
@@ -335,12 +335,12 @@ TOKEN: {
   <CNTRL_ESC: ["\"","\\","/","b","f","n","r","t"]> : STRING_STATE
 }
 
-Expr SC(): { Expr expr; }
+private Expr SC(): { Expr expr; }
 {
-  expr = A() { return expr; }
+  expr = A() <EOF> { return expr; }
 }
 
-Expr SA(): { Expr id, expr, result; }
+private Expr SA(): { Expr id, expr, result; }
 {
     id = Id() (<ASSIGNMENT> expr = A() {result = new AssignExpr(id, expr,"=");}
               | <MINUSASSIGNMENT> expr = A() {result = new AssignExpr(id, expr,"-=");}
@@ -349,30 +349,30 @@ Expr SA(): { Expr id, expr, result; }
               | <DASSIGNMENT> expr = A() {result = new AssignExpr(id, expr,"/=");}
               | <ORASSIGNMENT> expr = A() {result = new AssignExpr(id, expr,"|=");}
               | <ANDASSIGNMENT> expr = A() {result = new AssignExpr(id, expr,"&=");}
-              | <MODASSIGNMENT> expr = A() {result = new AssignExpr(id, expr,"%=");})
+              | <MODASSIGNMENT> expr = A() {result = new AssignExpr(id, expr,"%=");}) <EOF>
     {return result;}
 }
 
-Expr A() : { Expr expr1, expr2; }
+private Expr A() : { Expr expr1, expr2; }
 {
   expr1 = B() (<OR> expr2 = B() {expr1 = new BinaryExpr("||", expr1, expr2);})*
   { return expr1; }
 }
 
-Expr B() : { Expr expr1, expr2; }
+private Expr B() : { Expr expr1, expr2; }
 {
   expr1 = C() (<AND> expr2 = C() {expr1 = new BinaryExpr("&&", expr1, expr2);})*
   { return expr1; }
 }
 
-Expr C() : { Expr expr1, expr2; }
+private Expr C() : { Expr expr1, expr2; }
 {
   expr1 = D() (<EQ> expr2 = D() {expr1 = new BinaryExpr("==", expr1, expr2);}
               |<NEQ> expr2 = D() {expr1 = new BinaryExpr("!=", expr1, expr2);})*
   { return expr1; }
 }
 
-Expr D() : { Expr expr1, expr2; }
+private Expr D() : { Expr expr1, expr2; }
 {
   expr1 = E() (<GEQ> expr2 = E() {expr1 = new BinaryExpr(">=", expr1, expr2);}
               |<GT> expr2 = E() {expr1 = new BinaryExpr(">", expr1, expr2);}
@@ -381,14 +381,14 @@ Expr D() : { Expr expr1, expr2; }
   { return expr1; }
 }
 
-Expr E() : { Expr expr1, expr2; }
+private Expr E() : { Expr expr1, expr2; }
 {
   expr1 = F() (<PLUS> expr2 = F() {expr1 = new BinaryExpr("+", expr1, expr2);}
               |<MINUS> expr2 = F() {expr1 = new BinaryExpr("-", expr1, expr2);})*
   { return expr1; }
 }
 
-Expr F() : { Expr expr1, expr2; }
+private Expr F() : { Expr expr1, expr2; }
 {
   expr1 = G() (<MULTIPLY> expr2 = G() {expr1 = new BinaryExpr("*", expr1, expr2);}
               |<DIVIDE> expr2 = G() {expr1 = new BinaryExpr("/", expr1, expr2);}
@@ -396,7 +396,7 @@ Expr F() : { Expr expr1, expr2; }
   { return expr1; }
 }
 
-Expr G(): { Expr expr; }
+private Expr G(): { Expr expr; }
 {
   expr = Num() { return expr; }
   | expr = Id() { return expr; }
@@ -405,37 +405,37 @@ Expr G(): { Expr expr; }
   | <LPAREN> expr = A() <RPAREN> { return expr; }
 }
 
-Expr Num(): { Expr number; }
+private Expr Num(): { Expr number; }
 {
     number = Int() { return number; }
     | number = Real() { return number; }
 }
 
-Expr Int(): { Token number; }
+private Expr Int(): { Token number; }
 {
     number = <INT> { return new Int(Integer.parseInt(number.image)); }
     | <MINUS> number = <INT> { return new Int(-Integer.parseInt(number.image)); }
     | <PLUS> number = <INT> { return new Int(Integer.parseInt(number.image)); }
 }
 
-Expr Real(): { Token number; }
+private Expr Real(): { Token number; }
 {
     number = <REAL> { return new Real(Double.parseDouble(number.image)); }
     | <MINUS> number = <REAL> { return new Real(-Double.parseDouble(number.image)); }
     | <PLUS> number = <REAL> { return new Real(Double.parseDouble(number.image)); }
 }
 
-Expr Id(): { Token id; }
+private Expr Id(): { Token id; }
 {
     id = <ID> { return new Id(id.image); }
 }
 
-Expr MyString(): { StringBuilder builder = new StringBuilder(); }
+private Expr MyString(): { StringBuilder builder = new StringBuilder(); }
 {
    <QUOTE> ( getChar(builder) )* <ENDQUOTE> {return new MyString(builder.toString());}
 }
 
-void getChar(StringBuilder builder):
+private void getChar(StringBuilder builder):
 {
   Token t;
 }
@@ -464,7 +464,7 @@ void getChar(StringBuilder builder):
   }
 }
 
-Expr Bool(): { Token bool; }
+private Expr Bool(): { Token bool; }
 {
     bool = <TRUE> { return new Bool(true); }
     | bool = <FALSE> { return new Bool(false); }
@@ -494,4 +494,36 @@ Expr semanticCheckForAssign(Map<String, SemanticType> semanticTypeMap):
     expr.visit(visitor);
     return expr;
   }
+}
+
+Expr parseString():
+{
+    Expr expr;
+}
+{
+    expr = MyString() <EOF> { return expr; }
+}
+
+Expr parseInt():
+{
+    Expr expr;
+}
+{
+    expr = Int() <EOF> { return expr; }
+}
+
+Expr parseBool():
+{
+    Expr expr;
+}
+{
+    expr = Bool() <EOF> { return expr; }
+}
+
+Expr parseDouble():
+{
+    Expr expr;
+}
+{
+    expr = Real() <EOF> { return expr; }
 }

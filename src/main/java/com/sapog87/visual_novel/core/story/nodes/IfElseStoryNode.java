@@ -6,34 +6,30 @@ import com.sapog87.visual_novel.core.story.VariableInfo;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-public class IfElseStoryNode extends StoryNode {
+public final class IfElseStoryNode extends LogicalStoryNode {
     private Expr expr;
-
-    public IfElseStoryNode(StoryNode node, Map<String, VariableInfo> variables) {
-        super(node, variables);
-    }
 
     @Override
     public void validate() {
-        if (getNext().isEmpty() || getPrev().isEmpty()) {
+        if (getNext().isEmpty() || getPrev().isEmpty())
             throw new IllegalArgumentException("node must have inputs and outputs");
-        }
-        if (!getData().containsKey("condition")) {
+        for (List<String> t : getNext())
+            if (t.size() != 1)
+                throw new IllegalArgumentException("each output must be connected to one node");
+        if (!getData().containsKey("condition"))
             throw new IllegalArgumentException("node must have {condition} field");
-        }
-        if (getData().get("condition").isBlank()) {
+        if (getData().get("condition").isBlank())
             throw new IllegalArgumentException("{condition} field in node must not be empty");
-        }
+        super.validate();
 
         Parser parser = getParser();
-
         Map<String, SemanticType> semanticTypeMap = getSemanticTypeMap();
-
         try {
             expr = parser.semanticCheckForCondition(semanticTypeMap);
-        } catch (ParseException e) {
+        } catch (ParseException | TokenMgrError e) {
             throw new IllegalArgumentException(e);
         }
     }
@@ -42,13 +38,6 @@ public class IfElseStoryNode extends StoryNode {
         String initialString = getData().get("condition");
         InputStream targetStream = new ByteArrayInputStream(initialString.getBytes());
         return new Parser(targetStream);
-    }
-
-    private Map<String, SemanticType> getSemanticTypeMap() {
-        Map<String, SemanticType> semanticTypeMap = new HashMap<>();
-        for (var x : getVariables().entrySet())
-            semanticTypeMap.put(x.getKey(), x.getValue().getType());
-        return semanticTypeMap;
     }
 
     public Boolean compute(Map<String, VariableInfo> variables) {

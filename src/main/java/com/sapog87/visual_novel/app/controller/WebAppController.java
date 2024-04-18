@@ -1,14 +1,15 @@
 package com.sapog87.visual_novel.app.controller;
 
+import com.sapog87.visual_novel.interpreter.Response;
 import com.sapog87.visual_novel.interpreter.StoryInterpreter;
+import com.sapog87.visual_novel.interpreter.data.UserData;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 @Slf4j
@@ -23,17 +24,40 @@ public class WebAppController {
     public WebAppController(StoryInterpreter interpreter) {this.interpreter = interpreter;}
 
     @GetMapping("/story")
-    public String nextNode(Model model, @RequestParam("user") String user, @RequestParam(value = "node", required = false) String node) {
+    public String nextNode(
+            Model model,
+            @RequestParam("user") String user,
+            @RequestParam(value = "node", required = false) String node,
+            @RequestParam(value = "data", required = false) String data
+    ) {
         if (!useWebApp) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
-        //TODO добавить возможность слать сообщение
         //TODO добавить возможность слать запросы с разных устройств одновременно без нарушения повествования или ограничить доступ с нескольких устройств
         Long userId = Long.parseLong(user);
-        var data = interpreter.next(userId, node, null);
-        model.addAttribute("data", data);
+        UserData userData = null;
+        if (data != null)
+            userData = new UserData(userId, node, data);
+        var modelData = interpreter.next(userId, node, userData);
+
+        model.addAttribute("picture", modelData.getNodePicture());
+        model.addAttribute("text", modelData.getNodeText());
+        model.addAttribute("buttons", modelData.getButtons());
         model.addAttribute("userId", userId);
+
+        model.addAttribute("textField", modelData.getHasTextField());
+        model.addAttribute("nodeId", modelData.getNodeId());
+
         return templateName;
+    }
+
+    @GetMapping("/api")
+    public @ResponseBody Response api() {
+        Response response = new Response();
+        response.setUserId(1L);
+        response.setStop(false);
+        response.setAnswer("1");
+        return response;
     }
 
     //TODO добавить рестарт

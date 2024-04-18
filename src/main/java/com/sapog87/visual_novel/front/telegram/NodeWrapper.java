@@ -7,12 +7,15 @@ import java.util.List;
 
 @Getter
 @Setter
-public class StoryNodeWrapper {
+public class NodeWrapper {
+    private String nodeId;
     private String nodeText;
     private String nodePicture;
     private List<Button> buttons;
+    private Boolean hasTextField;
 
-    public StoryNodeWrapper(String nodeText, String nodePicture, List<Button> buttons) {
+    public NodeWrapper(String nodeId, String nodeText, String nodePicture, List<Button> buttons) {
+        this.nodeId = nodeId;
         this.nodeText = nodeText;
         this.nodePicture = nodePicture;
         this.buttons = buttons;

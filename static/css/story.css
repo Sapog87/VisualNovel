@@ -19,6 +19,17 @@
     box-shadow: none;
 }
 
+.story-textarea {
+    margin: 5%;
+    width: 90%;
+    height: auto;
+    text-align: left;
+    padding: 2%;
+    border-radius: 10px;
+    border: 0;
+    box-shadow: none;
+}
+
 .story-text {
     margin: 5%;
     width: 90%;

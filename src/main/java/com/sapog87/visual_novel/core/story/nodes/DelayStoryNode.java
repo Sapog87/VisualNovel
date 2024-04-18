@@ -4,11 +4,7 @@ import com.sapog87.visual_novel.core.story.VariableInfo;
 
 import java.util.Map;
 
-public class DelayStoryNode extends StoryNode {
-    public DelayStoryNode(StoryNode node, Map<String, VariableInfo> variables) {
-        super(node, variables);
-    }
-
+public final class DelayStoryNode extends LogicalStoryNode {
     @Override
     public void validate() {
         if (getNext().isEmpty() || getPrev().isEmpty()) {
@@ -23,6 +19,8 @@ public class DelayStoryNode extends StoryNode {
         if (getData().get("time").isBlank()) {
             throw new IllegalArgumentException("{time} field in node must not be empty");
         }
+        super.validate();
+
         try {
             double time = Double.parseDouble(getData().get("time"));
             if (time < 0) {

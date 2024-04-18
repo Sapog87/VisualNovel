@@ -17,7 +17,17 @@ public class VisualNovelApplication {
 
     public static void main(String[] args) {
         var context = SpringApplication.run(VisualNovelApplication.class, args);
-        context.getBean(Bot.class).startStory();
+        context.getBean(Bot.class).start("story.json");
+
+        //TODO добавить security
+        //TODO добавить интерполяцию строк
+        //TODO переделать валидации
+
+        //TODO дописать отладчик
+        //TODO довавить возможность выделять и перемещать сразу несколько узлов
+        //TODO пофиксить срывы при выходе за пределы окна
+        //TODO сохранять ширину узла в зависимости от textarea
+
     }
 
 }

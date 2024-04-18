@@ -6,15 +6,7 @@ import org.springframework.stereotype.Component;
 import java.util.Map;
 
 @Component
-public class StartStoryNode extends TerminalNode {
-    public StartStoryNode() {
-        super();
-    }
-
-    public StartStoryNode(StoryNode node, Map<String, VariableInfo> variables) {
-        super(node, variables);
-    }
-
+public final class StartStoryNode extends TerminalStoryNode {
     @Override
     public void validate() {
         if (getNext().isEmpty() || !getPrev().isEmpty()) {
@@ -23,19 +15,6 @@ public class StartStoryNode extends TerminalNode {
         if (getNext().get(0).isEmpty()) {
             throw new IllegalArgumentException("node must have outputs");
         }
-        if (!getData().containsKey("text")) {
-            throw new IllegalArgumentException("node must have {text} field");
-        }
-        if (getData().get("text").isBlank()) {
-            throw new IllegalArgumentException("{text} field in node must not be empty");
-        }
-        if (!getData().containsKey("picture")) {
-            throw new IllegalArgumentException("node must have {picture} field");
-        }
-        for (String id : getNext().get(0)) {
-            if (!getStory().get(id).getNodeType().equals(NodeType.BUTTON)) {
-                throw new IllegalArgumentException("all outputs of node must be buttons");
-            }
-        }
+        super.validate();
     }
 }

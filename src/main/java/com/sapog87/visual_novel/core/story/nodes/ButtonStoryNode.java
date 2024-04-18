@@ -1,12 +1,10 @@
 package com.sapog87.visual_novel.core.story.nodes;
 
-import com.sapog87.visual_novel.core.story.VariableInfo;
+import java.util.ArrayList;
 
-import java.util.Map;
-
-public class ButtonStoryNode extends StoryNode {
-    public ButtonStoryNode(StoryNode node, Map<String, VariableInfo> variables) {
-        super(node, variables);
+public final class ButtonStoryNode extends StoryNode {
+    ButtonStoryNode() {
+        super();
     }
 
     @Override
@@ -22,6 +20,10 @@ public class ButtonStoryNode extends StoryNode {
         }
         if (getData().get("text").isBlank()) {
             throw new IllegalArgumentException("{text} field in node must not be empty");
+        }
+        for (String id : getNext().isEmpty() ? new ArrayList<String>() : getNext().get(0)) {
+            if (getStory().get(id) instanceof ButtonStoryNode)
+                throw new IllegalArgumentException("output of button must not be button");
         }
     }
 }

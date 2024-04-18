@@ -3,18 +3,13 @@ package com.sapog87.visual_novel.core.story.nodes;
 import com.sapog87.visual_novel.core.parser.ParseException;
 import com.sapog87.visual_novel.core.parser.Parser;
 import com.sapog87.visual_novel.core.parser.SemanticType;
-import com.sapog87.visual_novel.core.story.Story;
-import com.sapog87.visual_novel.core.story.VariableInfo;
+import com.sapog87.visual_novel.core.parser.TokenMgrError;
+import com.sapog87.visual_novel.core.story.Utility;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.util.Map;
 
-public class VariableStoryNode extends StoryNode {
-    public VariableStoryNode(StoryNode node, Map<String, VariableInfo> variables) {
-        super(node, variables);
-    }
-
+public final class VariableStoryNode extends StoryNode {
     @Override
     public void validate() {
         if (!getNext().isEmpty() || !getPrev().isEmpty()) {
@@ -38,29 +33,35 @@ public class VariableStoryNode extends StoryNode {
         if (getData().get("value").isBlank()) {
             throw new IllegalArgumentException("{value} field in node must not be empty");
         }
+        if (!getData().containsKey("statetype")) {
+            throw new IllegalArgumentException("node must have {statetype} field");
+        }
+        if (getData().get("statetype").isBlank()) {
+            throw new IllegalArgumentException("{statetype} field in node must not be empty");
+        }
 
         try {
             validateType();
-        } catch (ParseException e) {
-            throw new RuntimeException(e);
+        } catch (ParseException | TokenMgrError e) {
+            throw new IllegalArgumentException(e);
         }
     }
 
     private void validateType() throws ParseException {
-        SemanticType semanticType = Story.getSemanticType(getData().get("type"));
+        SemanticType semanticType = Utility.toSemanticType(getData().get("type"));
         Parser parser = getParser();
         switch (semanticType) {
-            case STRING -> parser.MyString();
+            case STRING -> parser.parseString();
             case REAL -> {
                 try {
-                    parser.Real();
+                    parser.parseDouble();
                 } catch (ParseException e) {
                     parser = getParser();
-                    parser.Int();
+                    parser.parseInt();
                 }
             }
-            case INT -> parser.Int();
-            case BOOL -> parser.Bool();
+            case INT -> parser.parseInt();
+            case BOOL -> parser.parseBool();
         }
     }
 

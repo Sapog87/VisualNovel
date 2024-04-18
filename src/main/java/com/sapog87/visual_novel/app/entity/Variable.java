@@ -1,14 +1,18 @@
 package com.sapog87.visual_novel.app.entity;
 
+import com.sapog87.visual_novel.app.exception.VariableIllegalTypeException;
 import com.sapog87.visual_novel.app.repository.converter.TypeConverter;
 import com.sapog87.visual_novel.core.parser.SemanticType;
+import com.sapog87.visual_novel.core.story.VariableInfo;
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
 @Getter
 @Setter
+@NoArgsConstructor
 public class Variable {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
@@ -32,6 +36,14 @@ public class Variable {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    public Variable(VariableInfo info, User user) {
+        setName(info.getName());
+        setType(info.getType());
+        setValue(info.getValue());
+        setPermanent(info.getPermanent());
+        setUser(user);
+    }
+
     public Object getValue() {
         return switch (type) {
             case STRING -> value;
@@ -40,8 +52,7 @@ public class Variable {
             case BOOL -> {
                 Boolean bool = Boolean.valueOf(value);
                 if (!bool.toString().equalsIgnoreCase(value)){
-                    //TODO создать VariableIllegalTypeException
-                    throw new RuntimeException("VariableIllegalTypeException");
+                    throw new VariableIllegalTypeException("Value is not a Boolean type");
                 }
                 yield bool;
             }
@@ -51,8 +62,7 @@ public class Variable {
 
     public void setValue(Object value) {
         if (!checkType(value.toString())) {
-            //TODO создать VariableIllegalTypeException
-            throw new RuntimeException("VariableIllegalTypeException");
+            throw new VariableIllegalTypeException("Unacceptable type");
         }
         this.value = value.toString();
     }

@@ -6,8 +6,8 @@ import lombok.Setter;
 import java.io.Serializable;
 import java.util.List;
 
-@Getter
 @Setter
+@Getter
 public class Input implements Serializable {
     private List<Connection> connections;
 

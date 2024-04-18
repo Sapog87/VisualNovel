@@ -1,7 +1,10 @@
 package com.sapog87.visual_novel.app.entity;
 
+import com.sapog87.visual_novel.core.story.Story;
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.Map;
@@ -9,6 +12,7 @@ import java.util.Map;
 @Entity
 @Getter
 @Setter
+@NoArgsConstructor
 @Table(name = "`user`", indexes = @Index(columnList = "externalUserId"))
 public class User {
     @Id
@@ -22,14 +26,13 @@ public class User {
     @Column
     private String storyNodeId;
 
-    @Column
-    private Long chatId;
+    @OneToOne(mappedBy = "user")
+    private Message lastMessage;
 
-    @Column
-    private Integer messageId;
+    @Version
+    private Integer version;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
     @MapKey(name = "name")
     private Map<String, Variable> variables;
-
 }
