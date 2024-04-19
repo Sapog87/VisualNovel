@@ -1,4 +1,4 @@
-package com.sapog87.visual_novel.front.telegram;
+package com.sapog87.visual_novel.front;
 
 import lombok.Getter;
 import lombok.Setter;

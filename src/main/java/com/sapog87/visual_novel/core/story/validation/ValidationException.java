@@ -1,4 +1,4 @@
-package com.sapog87.visual_novel.core.story;
+package com.sapog87.visual_novel.core.story.validation;
 
 import lombok.Getter;
 

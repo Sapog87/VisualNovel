@@ -33,7 +33,7 @@ public class WebAppController {
         if (!useWebApp) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
-        //TODO добавить возможность слать запросы с разных устройств одновременно без нарушения повествования или ограничить доступ с нескольких устройств
+        //TODO прикрутить версионирование
         Long userId = Long.parseLong(user);
         UserData userData = null;
         if (data != null)

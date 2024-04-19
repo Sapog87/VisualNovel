@@ -25,6 +25,6 @@ public class Message {
     @Column
     private String nodeId;
 
-    @OneToOne
+    @OneToOne(mappedBy = "lastMessage")
     private User user;
 }

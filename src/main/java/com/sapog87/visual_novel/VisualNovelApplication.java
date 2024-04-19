@@ -1,7 +1,7 @@
 package com.sapog87.visual_novel;
 
 import com.pengrad.telegrambot.TelegramBot;
-import com.sapog87.visual_novel.front.telegram.Bot;
+import com.sapog87.visual_novel.front.Bot;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -22,6 +22,7 @@ public class VisualNovelApplication {
         //TODO добавить security
         //TODO добавить интерполяцию строк
         //TODO переделать валидации
+        //TODO довести до ума webapp
 
         //TODO дописать отладчик
         //TODO довавить возможность выделять и перемещать сразу несколько узлов

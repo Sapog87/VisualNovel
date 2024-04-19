@@ -1,13 +1,14 @@
 package com.sapog87.visual_novel.interpreter;
 
 import com.sapog87.visual_novel.app.entity.User;
+import com.sapog87.visual_novel.app.exception.UserNotFoundException;
 import com.sapog87.visual_novel.app.service.StoryService;
 import com.sapog87.visual_novel.core.json.Root;
 import com.sapog87.visual_novel.core.story.Story;
 import com.sapog87.visual_novel.core.story.nodes.StoryNode;
 import com.sapog87.visual_novel.core.story.nodes.TerminalStoryNode;
-import com.sapog87.visual_novel.front.telegram.MessageData;
-import com.sapog87.visual_novel.front.telegram.NodeWrapper;
+import com.sapog87.visual_novel.front.MessageData;
+import com.sapog87.visual_novel.front.NodeWrapper;
 import com.sapog87.visual_novel.interpreter.data.Data;
 import com.sapog87.visual_novel.interpreter.processor.LogicalStoryNodeProcessor;
 import com.sapog87.visual_novel.interpreter.processor.TerminalStoryNodeProcessor;
@@ -43,7 +44,8 @@ public class StoryInterpreter {
 
     @Transactional
     public NodeWrapper next(Long telegramUserId, String storyNodeId, Data data) {
-        return proceed(telegramUserId, storyNodeId, data, false);
+        log.info("Proceeding story for user {}", telegramUserId);
+        return this.proceed(telegramUserId, storyNodeId, data, false);
     }
 
     private NodeWrapper proceed(Long telegramUserId, String storyNodeId, Data data, boolean restart) {
@@ -60,27 +62,33 @@ public class StoryInterpreter {
             node = story.getNodeById(nodeId);
         }
 
-        interpreterService.saveCurrentStoryStateIfChanged(user, nodeId);
+        interpreterService.saveCurrentStoryState(user, nodeId);
 
         return terminalStoryNodeProcessor.processNode(node, user, story, data);
     }
 
     @Transactional
     public NodeWrapper restart(Long telegramUserId) {
-        return proceed(telegramUserId, null, null, true);
+        log.info("Restarting story for user {}", telegramUserId);
+        return this.proceed(telegramUserId, null, null, true);
     }
 
+    //TODO разобраться с транзакциями
+    @Transactional(dontRollbackOn = UserNotFoundException.class)
     public void setLastMessageData(Long telegramUserId, MessageData data) {
+        log.info("Setting last message data for user {}", telegramUserId);
         interpreterService.setLastMessageData(telegramUserId, data);
     }
 
-    //TODO разобраться с транзакциями
+    @Transactional(dontRollbackOn = UserNotFoundException.class)
     public MessageData getLastMessageData(Long telegramUserId) {
+        log.info("Getting last message data for user {}", telegramUserId);
         return interpreterService.getLastMessageData(telegramUserId);
     }
 
-    //TODO разобраться с транзакциями
+    @Transactional(dontRollbackOn = UserNotFoundException.class)
     public Integer version(Long telegramUserId) {
+        log.info("Getting version for user {}", telegramUserId);
         return interpreterService.version(telegramUserId);
     }
 }

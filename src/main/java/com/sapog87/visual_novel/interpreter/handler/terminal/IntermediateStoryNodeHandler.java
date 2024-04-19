@@ -4,7 +4,7 @@ import com.sapog87.visual_novel.app.entity.User;
 import com.sapog87.visual_novel.core.story.Story;
 import com.sapog87.visual_novel.core.story.nodes.IntermediateStoryNode;
 import com.sapog87.visual_novel.core.story.nodes.StoryNode;
-import com.sapog87.visual_novel.front.telegram.NodeWrapper;
+import com.sapog87.visual_novel.front.NodeWrapper;
 import com.sapog87.visual_novel.interpreter.Utility;
 import com.sapog87.visual_novel.interpreter.data.Data;
 import com.sapog87.visual_novel.interpreter.handler.StoryNodeHandler;

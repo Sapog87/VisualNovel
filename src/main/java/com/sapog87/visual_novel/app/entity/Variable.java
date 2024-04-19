@@ -50,8 +50,8 @@ public class Variable {
             case REAL -> Double.valueOf(value);
             case INT -> Integer.valueOf(value);
             case BOOL -> {
-                Boolean bool = Boolean.valueOf(value);
-                if (!bool.toString().equalsIgnoreCase(value)){
+                boolean bool = Boolean.parseBoolean(value);
+                if (!Boolean.toString(bool).equalsIgnoreCase(value)){
                     throw new VariableIllegalTypeException("Value is not a Boolean type");
                 }
                 yield bool;

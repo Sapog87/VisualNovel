@@ -5,6 +5,8 @@ import com.sapog87.visual_novel.core.json.Node;
 import com.sapog87.visual_novel.core.json.Root;
 import com.sapog87.visual_novel.core.parser.SemanticType;
 import com.sapog87.visual_novel.core.story.nodes.*;
+import com.sapog87.visual_novel.core.story.validation.ValidationErrorInfo;
+import com.sapog87.visual_novel.core.story.validation.ValidationException;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 

@@ -1,8 +1,6 @@
 package com.sapog87.visual_novel.app.entity;
 
-import com.sapog87.visual_novel.core.story.Story;
 import jakarta.persistence.*;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -26,7 +24,7 @@ public class User {
     @Column
     private String storyNodeId;
 
-    @OneToOne(mappedBy = "user")
+    @OneToOne(fetch = FetchType.LAZY)
     private Message lastMessage;
 
     @Version

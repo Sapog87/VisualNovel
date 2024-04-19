@@ -1,12 +1,12 @@
-package com.sapog87.visual_novel.front.telegram;
+package com.sapog87.visual_novel.front;
 
 import lombok.Getter;
 
 @Getter
 public class Button {
-    private String id;
-    private String text;
-    private String nextNodeId;
+    private final String id;
+    private final String text;
+    private final String nextNodeId;
 
     public Button(String id, String text, String nextNodeId) {
         this.id = id;

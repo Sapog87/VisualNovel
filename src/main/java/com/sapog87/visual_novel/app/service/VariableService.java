@@ -4,14 +4,14 @@ import com.sapog87.visual_novel.app.dto.VariableDto;
 import com.sapog87.visual_novel.app.entity.Variable;
 import com.sapog87.visual_novel.app.exception.VariableIllegalStateException;
 import com.sapog87.visual_novel.app.exception.VariableNotFoundException;
-import com.sapog87.visual_novel.app.repository.StoryVariableRepository;
+import com.sapog87.visual_novel.app.repository.VariableRepository;
 import org.springframework.stereotype.Service;
 
 @Service
 public class VariableService {
-    private final StoryVariableRepository variableRepository;
+    private final VariableRepository variableRepository;
 
-    public VariableService(StoryVariableRepository variableRepository) {this.variableRepository = variableRepository;}
+    public VariableService(VariableRepository variableRepository) {this.variableRepository = variableRepository;}
 
     public Boolean change(VariableDto variableDto) {
         Variable variable = variableRepository.findByName(variableDto.getName());

@@ -4,8 +4,8 @@ import com.sapog87.visual_novel.core.story.Story;
 import com.sapog87.visual_novel.core.story.nodes.ButtonStoryNode;
 import com.sapog87.visual_novel.core.story.nodes.StoryNode;
 import com.sapog87.visual_novel.core.story.nodes.TerminalStoryNode;
-import com.sapog87.visual_novel.front.telegram.Button;
-import com.sapog87.visual_novel.front.telegram.NodeWrapper;
+import com.sapog87.visual_novel.front.Button;
+import com.sapog87.visual_novel.front.NodeWrapper;
 
 import java.util.List;
 
