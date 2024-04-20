@@ -1,6 +1,6 @@
 package com.sapog87.visual_novel.interpreter.processor;
 
-import com.sapog87.visual_novel.core.story.nodes.LogicalStoryNode;
+import com.sapog87.visual_novel.core.story.nodes.logical.LogicalStoryNode;
 import com.sapog87.visual_novel.interpreter.handler.StoryNodeHandler;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Component;

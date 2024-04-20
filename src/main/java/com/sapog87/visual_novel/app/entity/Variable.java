@@ -3,7 +3,7 @@ package com.sapog87.visual_novel.app.entity;
 import com.sapog87.visual_novel.app.exception.VariableIllegalTypeException;
 import com.sapog87.visual_novel.app.repository.converter.TypeConverter;
 import com.sapog87.visual_novel.core.parser.SemanticType;
-import com.sapog87.visual_novel.core.story.VariableInfo;
+import com.sapog87.visual_novel.core.story.nodes.variable.VariableInfo;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -37,11 +37,11 @@ public class Variable {
     private User user;
 
     public Variable(VariableInfo info, User user) {
-        setName(info.getName());
-        setType(info.getType());
-        setValue(info.getValue());
-        setPermanent(info.getPermanent());
-        setUser(user);
+        this.setName(info.getName());
+        this.setType(info.getType());
+        this.setValue(info.getValue());
+        this.setPermanent(info.getPermanent());
+        this.setUser(user);
     }
 
     public Object getValue() {
@@ -61,7 +61,7 @@ public class Variable {
     }
 
     public void setValue(Object value) {
-        if (!checkType(value.toString())) {
+        if (!this.checkType(value.toString())) {
             throw new VariableIllegalTypeException("Unacceptable type");
         }
         this.value = value.toString();

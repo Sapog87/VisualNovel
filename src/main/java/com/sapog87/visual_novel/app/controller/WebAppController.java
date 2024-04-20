@@ -1,12 +1,11 @@
 package com.sapog87.visual_novel.app.controller;
 
-import com.sapog87.visual_novel.interpreter.Response;
+import com.sapog87.visual_novel.interpreter.data.Response;
 import com.sapog87.visual_novel.interpreter.StoryInterpreter;
 import com.sapog87.visual_novel.interpreter.data.UserData;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -15,13 +14,13 @@ import org.springframework.web.server.ResponseStatusException;
 @Slf4j
 @Controller
 public class WebAppController {
-    private final StoryInterpreter interpreter;
+    private final StoryInterpreter storyInterpreter;
     @Value("${template-name}")
     private String templateName;
     @Value("${webapp-mode}")
     private Boolean useWebApp;
 
-    public WebAppController(StoryInterpreter interpreter) {this.interpreter = interpreter;}
+    public WebAppController(StoryInterpreter storyInterpreter) {this.storyInterpreter = storyInterpreter;}
 
     @GetMapping("/story")
     public String nextNode(
@@ -38,7 +37,7 @@ public class WebAppController {
         UserData userData = null;
         if (data != null)
             userData = new UserData(userId, node, data);
-        var modelData = interpreter.next(userId, node, userData);
+        var modelData = storyInterpreter.next(userId, node, userData);
 
         model.addAttribute("picture", modelData.getNodePicture());
         model.addAttribute("text", modelData.getNodeText());

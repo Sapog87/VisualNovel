@@ -1,6 +1,6 @@
 package com.sapog87.visual_novel.core.parser;
 
-import com.sapog87.visual_novel.core.story.VariableInfo;
+import com.sapog87.visual_novel.core.story.nodes.variable.VariableInfo;
 import lombok.Getter;
 
 import java.util.Map;

@@ -2,7 +2,7 @@ package com.sapog87.visual_novel.app.controller;
 
 import com.sapog87.visual_novel.app.service.StoryService;
 import com.sapog87.visual_novel.core.json.Root;
-import com.sapog87.visual_novel.interpreter.Response;
+import com.sapog87.visual_novel.interpreter.data.Response;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;

@@ -1,6 +1,8 @@
-package com.sapog87.visual_novel.core.story.nodes;
+package com.sapog87.visual_novel.core.story.nodes.logical;
 
 import com.sapog87.visual_novel.core.parser.SemanticType;
+import com.sapog87.visual_novel.core.story.nodes.button.ButtonStoryNode;
+import com.sapog87.visual_novel.core.story.nodes.StoryNode;
 
 import java.util.ArrayList;
 import java.util.HashMap;

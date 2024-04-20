@@ -1,4 +1,4 @@
-package com.sapog87.visual_novel.interpreter;
+package com.sapog87.visual_novel.app.service;
 
 import com.sapog87.visual_novel.app.entity.User;
 import com.sapog87.visual_novel.app.entity.Variable;
@@ -7,17 +7,15 @@ import com.sapog87.visual_novel.app.repository.UserRepository;
 import com.sapog87.visual_novel.app.repository.VariableRepository;
 import com.sapog87.visual_novel.core.story.Story;
 import jakarta.transaction.Transactional;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 public class InterpreterService {
-
-    private static final Logger log = LoggerFactory.getLogger(InterpreterService.class);
     private final VariableRepository variableRepository;
     private final UserRepository userRepository;
 
@@ -27,7 +25,7 @@ public class InterpreterService {
     }
 
     @Transactional
-    void saveCurrentStoryState(User user, String nodeId) {
+    public void saveCurrentStoryState(User user, String nodeId) {
         log.info("Save current story state for user {}", user.getExternalUserId());
         user.setStoryNodeId(nodeId);
         user.setVersion(user.getVersion() + 1);
@@ -35,12 +33,15 @@ public class InterpreterService {
     }
 
     @Transactional
-    void restartStory(User user, Story story) {
+    public void restartStory(User user, Story story) {
         log.info("Restarting story for user {}", user.getExternalUserId());
         List<Variable> v = variableRepository.findAllByUser(user);
         v.forEach(x -> {
             if (!x.getPermanent())
-                x.setValue(story.getVariables().get(x.getName()).getValue());
+                x.setValue(story.getVariables()
+                        .get(x.getName())
+                        .getValue()
+                );
         });
         variableRepository.saveAll(v);
 
@@ -49,15 +50,14 @@ public class InterpreterService {
     }
 
     @Transactional
-    User findUserOrInit(Long telegramUserId, Story story) {
+    public User findUserOrInit(Long telegramUserId, Story story) {
         log.info("Finding user by telegram user id {}", telegramUserId);
         return userRepository
                 .findUserByExternalUserId(telegramUserId)
                 .orElseGet(() -> this.initUser(telegramUserId, story));
     }
 
-    @Transactional
-    User initUser(Long telegramUserId, Story story) {
+    private User initUser(Long telegramUserId, Story story) {
         log.info("Initializing user {}", telegramUserId);
         User user = this.constructUser(telegramUserId, story);
         List<Variable> variables = story
@@ -77,7 +77,7 @@ public class InterpreterService {
     }
 
     @Transactional(dontRollbackOn = UserNotFoundException.class)
-    Integer version(Long telegramUserId) {
+    public Integer version(Long telegramUserId) {
         log.info("Getting version of user {}", telegramUserId);
         return userRepository.findUserByExternalUserId(telegramUserId).orElseThrow(UserNotFoundException::new).getVersion();
     }

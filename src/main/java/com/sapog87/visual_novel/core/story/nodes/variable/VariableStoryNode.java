@@ -1,10 +1,11 @@
-package com.sapog87.visual_novel.core.story.nodes;
+package com.sapog87.visual_novel.core.story.nodes.variable;
 
 import com.sapog87.visual_novel.core.parser.ParseException;
 import com.sapog87.visual_novel.core.parser.Parser;
 import com.sapog87.visual_novel.core.parser.SemanticType;
 import com.sapog87.visual_novel.core.parser.TokenMgrError;
 import com.sapog87.visual_novel.core.story.Utility;
+import com.sapog87.visual_novel.core.story.nodes.StoryNode;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;

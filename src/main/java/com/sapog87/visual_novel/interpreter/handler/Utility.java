@@ -1,7 +1,7 @@
 package com.sapog87.visual_novel.interpreter.handler;
 
 import com.sapog87.visual_novel.app.entity.Variable;
-import com.sapog87.visual_novel.core.story.VariableInfo;
+import com.sapog87.visual_novel.core.story.nodes.variable.VariableInfo;
 
 import java.util.Map;
 import java.util.stream.Collectors;

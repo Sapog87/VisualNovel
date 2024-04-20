@@ -1,11 +1,10 @@
-package com.sapog87.visual_novel.core.story.nodes;
+package com.sapog87.visual_novel.core.story.nodes.logical;
 
 import com.sapog87.visual_novel.core.parser.*;
-import com.sapog87.visual_novel.core.story.VariableInfo;
+import com.sapog87.visual_novel.core.story.nodes.variable.VariableInfo;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.util.HashMap;
 import java.util.Map;
 
 public final class ActionStoryNode extends LogicalStoryNode {

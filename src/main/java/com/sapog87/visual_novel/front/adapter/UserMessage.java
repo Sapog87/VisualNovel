@@ -1,4 +1,4 @@
-package com.sapog87.visual_novel.front;
+package com.sapog87.visual_novel.front.adapter;
 
 import com.pengrad.telegrambot.model.Message;
 import com.sapog87.visual_novel.interpreter.data.Data;

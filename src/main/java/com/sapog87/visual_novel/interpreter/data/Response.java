@@ -1,4 +1,4 @@
-package com.sapog87.visual_novel.interpreter;
+package com.sapog87.visual_novel.interpreter.data;
 
 import lombok.Getter;
 import lombok.Setter;

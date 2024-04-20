@@ -2,13 +2,13 @@ package com.sapog87.visual_novel.interpreter;
 
 import com.sapog87.visual_novel.app.entity.User;
 import com.sapog87.visual_novel.app.exception.UserNotFoundException;
+import com.sapog87.visual_novel.app.service.InterpreterService;
 import com.sapog87.visual_novel.app.service.StoryService;
 import com.sapog87.visual_novel.core.json.Root;
 import com.sapog87.visual_novel.core.story.Story;
 import com.sapog87.visual_novel.core.story.nodes.StoryNode;
-import com.sapog87.visual_novel.core.story.nodes.TerminalStoryNode;
-import com.sapog87.visual_novel.front.MessageData;
-import com.sapog87.visual_novel.front.NodeWrapper;
+import com.sapog87.visual_novel.core.story.nodes.terminal.TerminalStoryNode;
+import com.sapog87.visual_novel.front.adapter.NodeWrapper;
 import com.sapog87.visual_novel.interpreter.data.Data;
 import com.sapog87.visual_novel.interpreter.processor.LogicalStoryNodeProcessor;
 import com.sapog87.visual_novel.interpreter.processor.TerminalStoryNodeProcessor;

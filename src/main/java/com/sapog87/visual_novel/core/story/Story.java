@@ -5,6 +5,10 @@ import com.sapog87.visual_novel.core.json.Node;
 import com.sapog87.visual_novel.core.json.Root;
 import com.sapog87.visual_novel.core.parser.SemanticType;
 import com.sapog87.visual_novel.core.story.nodes.*;
+import com.sapog87.visual_novel.core.story.nodes.terminal.EndStoryNode;
+import com.sapog87.visual_novel.core.story.nodes.terminal.StartStoryNode;
+import com.sapog87.visual_novel.core.story.nodes.variable.VariableInfo;
+import com.sapog87.visual_novel.core.story.nodes.variable.VariableStoryNode;
 import com.sapog87.visual_novel.core.story.validation.ValidationErrorInfo;
 import com.sapog87.visual_novel.core.story.validation.ValidationException;
 import lombok.Getter;
@@ -43,9 +47,8 @@ public class Story {
                         startNodeId = treeNode.getKey();
                     story.put(treeNode.getKey(), storyNode);
                 }
-            } else {
-                throw new IllegalArgumentException("Node with such id already exists {" + treeNode.getKey() + "}");
             }
+            throw new IllegalArgumentException("Node with such id already exists {" + treeNode.getKey() + "}");
         }
 
         this.toVariables(variableStoryNodes);
@@ -122,7 +125,11 @@ public class Story {
     }
 
     private Map<String, Supplier<StoryNode>> basicTypes() {
-        return Arrays.stream(StoryNodeType.values()).collect(Collectors.toMap(StoryNodeType::name, storyNodeType -> storyNodeType));
+        return Arrays.stream(StoryNodeType.values())
+                .collect(Collectors.toMap(
+                        StoryNodeType::name,
+                        storyNodeType -> storyNodeType)
+                );
     }
 
     private Supplier<StoryNode> getStoryNodeSupplier(Node node, Map<String, Supplier<StoryNode>> types) {
@@ -130,8 +137,7 @@ public class Story {
             String key = node.getMyClass().toUpperCase();
             if (types.containsKey(key))
                 return types.get(key);
-            else
-                throw new IllegalArgumentException("Unsupported node type " + key);
+            throw new IllegalArgumentException("Unsupported node type " + key);
         } catch (IllegalArgumentException e) {
             throw new ValidationException(List.of(new ValidationErrorInfo(null, e.getMessage())));
         }
@@ -154,7 +160,7 @@ public class Story {
         Boolean permanent = Boolean.valueOf(
                 node.getValue().getData().get("statetype")
         );
-        Object value = toJavaObject(
+        Object value = this.toJavaObject(
                 semanticType,
                 node.getValue().getData().get("value")
         );

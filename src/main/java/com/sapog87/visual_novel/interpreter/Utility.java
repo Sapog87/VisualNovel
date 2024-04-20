@@ -1,15 +1,15 @@
 package com.sapog87.visual_novel.interpreter;
 
 import com.sapog87.visual_novel.core.story.Story;
-import com.sapog87.visual_novel.core.story.nodes.ButtonStoryNode;
+import com.sapog87.visual_novel.core.story.nodes.button.ButtonStoryNode;
 import com.sapog87.visual_novel.core.story.nodes.StoryNode;
-import com.sapog87.visual_novel.core.story.nodes.TerminalStoryNode;
-import com.sapog87.visual_novel.front.Button;
-import com.sapog87.visual_novel.front.NodeWrapper;
+import com.sapog87.visual_novel.core.story.nodes.terminal.TerminalStoryNode;
+import com.sapog87.visual_novel.front.adapter.Button;
+import com.sapog87.visual_novel.front.adapter.NodeWrapper;
 
 import java.util.List;
 
-public class Utility {
+public final class Utility {
 
     private Utility() {}
 

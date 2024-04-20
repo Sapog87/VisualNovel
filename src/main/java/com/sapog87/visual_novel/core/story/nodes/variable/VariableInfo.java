@@ -1,16 +1,14 @@
-package com.sapog87.visual_novel.core.story;
+package com.sapog87.visual_novel.core.story.nodes.variable;
 
 import com.sapog87.visual_novel.core.parser.SemanticType;
 import lombok.Getter;
-import lombok.Setter;
 
 @Getter
-@Setter
-public class VariableInfo {
-    private String name;
-    private Object value;
-    private SemanticType type;
-    private Boolean permanent;
+public final class VariableInfo {
+    private final String name;
+    private final Object value;
+    private final SemanticType type;
+    private final Boolean permanent;
 
     public VariableInfo(String name, Object value, SemanticType type, Boolean permanent) {
         this.name = name;

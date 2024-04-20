@@ -1,9 +1,6 @@
-package com.sapog87.visual_novel.core.story.nodes;
+package com.sapog87.visual_novel.core.story.nodes.terminal;
 
-import com.sapog87.visual_novel.core.story.VariableInfo;
 import org.springframework.stereotype.Component;
-
-import java.util.Map;
 
 @Component
 public final class StartStoryNode extends TerminalStoryNode {

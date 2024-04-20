@@ -4,6 +4,8 @@ import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.UpdatesListener;
 import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.model.Update;
+import com.sapog87.visual_novel.app.service.TelegramService;
+import com.sapog87.visual_novel.front.adapter.UserMessage;
 import com.sapog87.visual_novel.interpreter.data.Data;
 import com.sapog87.visual_novel.interpreter.data.UserData;
 import lombok.extern.slf4j.Slf4j;
@@ -13,7 +15,7 @@ import java.util.Objects;
 
 @Slf4j
 @Component
-public class Bot {
+public final class Bot {
     private final TelegramBot bot;
     private final TelegramService telegramService;
 

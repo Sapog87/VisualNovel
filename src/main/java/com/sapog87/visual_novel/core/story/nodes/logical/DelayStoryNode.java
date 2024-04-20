@@ -1,8 +1,4 @@
-package com.sapog87.visual_novel.core.story.nodes;
-
-import com.sapog87.visual_novel.core.story.VariableInfo;
-
-import java.util.Map;
+package com.sapog87.visual_novel.core.story.nodes.logical;
 
 public final class DelayStoryNode extends LogicalStoryNode {
     @Override

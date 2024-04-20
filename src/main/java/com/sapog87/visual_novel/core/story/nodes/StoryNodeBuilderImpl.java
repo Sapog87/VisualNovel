@@ -1,6 +1,6 @@
 package com.sapog87.visual_novel.core.story.nodes;
 
-import com.sapog87.visual_novel.core.story.VariableInfo;
+import com.sapog87.visual_novel.core.story.nodes.variable.VariableInfo;
 
 import java.util.List;
 import java.util.Map;

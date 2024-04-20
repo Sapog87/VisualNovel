@@ -1,6 +1,6 @@
-package com.sapog87.visual_novel.core.story.nodes;
+package com.sapog87.visual_novel.core.story.nodes.terminal;
 
-import lombok.NoArgsConstructor;
+import com.sapog87.visual_novel.core.story.nodes.button.ButtonStoryNode;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;

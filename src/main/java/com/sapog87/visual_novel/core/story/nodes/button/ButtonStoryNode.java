@@ -1,12 +1,10 @@
-package com.sapog87.visual_novel.core.story.nodes;
+package com.sapog87.visual_novel.core.story.nodes.button;
+
+import com.sapog87.visual_novel.core.story.nodes.StoryNode;
 
 import java.util.ArrayList;
 
 public final class ButtonStoryNode extends StoryNode {
-    ButtonStoryNode() {
-        super();
-    }
-
     @Override
     public void validate() {
         if (getNext().isEmpty() || getPrev().isEmpty()) {

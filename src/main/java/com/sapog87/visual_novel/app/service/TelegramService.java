@@ -1,4 +1,4 @@
-package com.sapog87.visual_novel.front;
+package com.sapog87.visual_novel.app.service;
 
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.model.Message;
@@ -8,6 +8,9 @@ import com.pengrad.telegrambot.model.request.InlineKeyboardButton;
 import com.pengrad.telegrambot.model.request.InlineKeyboardMarkup;
 import com.pengrad.telegrambot.request.*;
 import com.sapog87.visual_novel.app.exception.UserNotFoundException;
+import com.sapog87.visual_novel.front.adapter.Button;
+import com.sapog87.visual_novel.front.adapter.NodeWrapper;
+import com.sapog87.visual_novel.front.adapter.UserMessage;
 import com.sapog87.visual_novel.interpreter.StoryInterpreter;
 import com.sapog87.visual_novel.interpreter.data.Data;
 import jakarta.transaction.Transactional;
@@ -22,7 +25,7 @@ import java.util.Objects;
 @Slf4j
 @Service
 public class TelegramService {
-    private final StoryInterpreter interpreter;
+    private final StoryInterpreter storyInterpreter;
     private final KeyboardFactory keyboardFactory;
     @Value("${domain}")
     private String domain;
@@ -33,8 +36,8 @@ public class TelegramService {
     @Value("${webapp-mode}")
     private Boolean useWebApp;
 
-    public TelegramService(StoryInterpreter interpreter) {
-        this.interpreter = interpreter;
+    public TelegramService(StoryInterpreter storyInterpreter) {
+        this.storyInterpreter = storyInterpreter;
         this.keyboardFactory = new KeyboardFactory();
     }
 
@@ -47,7 +50,7 @@ public class TelegramService {
         }
         log.info("Story location: {}", storyLocation);
         log.info("Pictures-location: {}", picturesLocation);
-        interpreter.load(storyLocation + fileName);
+        storyInterpreter.load(storyLocation + fileName);
     }
 
     @Transactional(dontRollbackOn = UserNotFoundException.class)
@@ -57,28 +60,34 @@ public class TelegramService {
 
         CallbackData callbackData = CallbackData.getCallbackData(userMessage);
 
-        if (callbackData.version != null && !this.checkVersion(userMessage.getUserId(), callbackData))
+        if (callbackData.version != null && !this.isVersionMatching(userMessage.getUserId(), callbackData))
             return;
 
         this.markPressedButton(bot, userMessage.getMessage(), callbackData);
         this.sendChatAction(bot, userMessage.getUserId());
-        this.sendMessage(bot, userMessage.isStartFlag(), userMessage.isRestartFlag(), userMessage.getUserId(), callbackData, userMessage.getData());
+        this.sendMessage(bot,
+                userMessage.isStartFlag(),
+                userMessage.isRestartFlag(),
+                userMessage.getUserId(),
+                callbackData,
+                userMessage.getData()
+        );
     }
 
-    private boolean checkVersion(Long userId, CallbackData callbackData) {
+    private boolean isVersionMatching(Long userId, CallbackData callbackData) {
         log.info("Checking version: {}", userId);
-        return interpreter.version(userId).equals(callbackData.version);
+        return storyInterpreter.version(userId).equals(callbackData.version);
     }
 
     private void markPressedButton(TelegramBot bot, Message message, CallbackData callbackData) {
         if (callbackData.nodeId == null)
             return;
 
-        InlineKeyboardMarkup keyboard = this.getInlineKeyboardMarkup(callbackData);
-        EditMessageCaption editMessageCaption = this.getEditMessageCaption(message, keyboard);
+        InlineKeyboardMarkup keyboard = this.createInlineKeyboardMarkup(callbackData);
+        EditMessageCaption editMessageCaption = this.buildEditMessageCaption(message, keyboard);
         var response = bot.execute(editMessageCaption);
         if (!response.isOk()) {
-            EditMessageText editMessageText = this.getEditMessageText(message, keyboard);
+            EditMessageText editMessageText = this.buildEditMessageText(message, keyboard);
             bot.execute(editMessageText);
         }
     }
@@ -92,33 +101,33 @@ public class TelegramService {
     private void sendMessage(TelegramBot bot, boolean startFlag, boolean restartFlag, Long userId, CallbackData callbackData, Data data) {
         log.info("Sending message to user: {}", userId);
         String nodeId = callbackData.nextNodeId;
-        RequestData requestData = this.getRequestData(bot, startFlag, restartFlag, userId, data, nodeId);
+        RequestData requestData = this.prepareRequestData(startFlag, restartFlag, userId, data, nodeId);
         this.sendRequest(bot, userId, requestData);
     }
 
-    private InlineKeyboardMarkup getInlineKeyboardMarkup(CallbackData callbackData) {
-        NodeWrapper node = interpreter.getNode(callbackData.nodeId);
-        return keyboardFactory.getMarkedInlineKeyboardMarkup(node, callbackData);
+    private InlineKeyboardMarkup createInlineKeyboardMarkup(CallbackData callbackData) {
+        NodeWrapper node = storyInterpreter.getNode(callbackData.nodeId);
+        return keyboardFactory.createMarkedInlineKeyboardMarkup(node, callbackData);
     }
 
-    private EditMessageCaption getEditMessageCaption(Message message, InlineKeyboardMarkup keyboard) {
+    private EditMessageCaption buildEditMessageCaption(Message message, InlineKeyboardMarkup keyboard) {
         EditMessageCaption editMessageCaption = new EditMessageCaption(message.chat().id(), message.messageId());
         editMessageCaption.caption(message.caption());
         editMessageCaption.replyMarkup(keyboard);
         return editMessageCaption;
     }
 
-    private EditMessageText getEditMessageText(Message message, InlineKeyboardMarkup keyboard) {
+    private EditMessageText buildEditMessageText(Message message, InlineKeyboardMarkup keyboard) {
         EditMessageText editMessageText = new EditMessageText(message.chat().id(), message.messageId(), message.text());
         editMessageText.replyMarkup(keyboard);
         return editMessageText;
     }
 
-    private RequestData getRequestData(TelegramBot bot, boolean startFlag, boolean restartFlag, Long userId, Data data, String nodeId) {
+    private RequestData prepareRequestData(boolean startFlag, boolean restartFlag, Long userId, Data data, String nodeId) {
         if (startFlag || restartFlag) {
             if (useWebApp)
                 return this.handleWebAppCommandRequest(restartFlag, userId);
-            return this.handleNonWebAppCommandRequest(bot, restartFlag, userId, data, nodeId);
+            return this.handleNonWebAppCommandRequest(restartFlag, userId, data, nodeId);
         }
         return this.handleDefaultRequest(userId, data, nodeId);
     }
@@ -138,36 +147,36 @@ public class TelegramService {
 
     private RequestData handleWebAppCommandRequest(boolean restartFlag, Long userId) {
         if (restartFlag)
-            interpreter.restart(userId);
+            storyInterpreter.restart(userId);
 
         return new RequestData(
                 //TODO поменять текст на property
                 new NodeWrapper("", "Let's begin", "", null),
-                keyboardFactory.getStartInlineKeyboardMarkupForWebApp(userId)
+                keyboardFactory.createStartInlineKeyboardMarkupForWebApp(userId)
         );
     }
 
-    private RequestData handleNonWebAppCommandRequest(TelegramBot bot, boolean restartFlag, Long userId, Data data, String nodeId) {
-        NodeWrapper node = this.getNodeWrapper(restartFlag, userId, data, nodeId);
-        return this.getRequestData(userId, node);
+    private RequestData handleNonWebAppCommandRequest(boolean restartFlag, Long userId, Data data, String nodeId) {
+        NodeWrapper node = this.createNodeWrapper(restartFlag, userId, data, nodeId);
+        return this.constructRequestData(userId, node);
     }
 
     private RequestData handleDefaultRequest(Long userId, Data data, String nodeId) {
-        NodeWrapper node = interpreter.next(userId, nodeId, data);
-        return this.getRequestData(userId, node);
+        NodeWrapper node = storyInterpreter.next(userId, nodeId, data);
+        return this.constructRequestData(userId, node);
     }
 
-    private NodeWrapper getNodeWrapper(boolean restartFlag, Long userId, Data data, String nodeId) {
+    private NodeWrapper createNodeWrapper(boolean restartFlag, Long userId, Data data, String nodeId) {
         if (restartFlag)
-            return interpreter.restart(userId);
-        return interpreter.next(userId, nodeId, data);
+            return storyInterpreter.restart(userId);
+        return storyInterpreter.next(userId, nodeId, data);
     }
 
-    private RequestData getRequestData(Long userId, NodeWrapper node) {
-        Integer version = interpreter.version(userId);
+    private RequestData constructRequestData(Long userId, NodeWrapper node) {
+        Integer version = storyInterpreter.version(userId);
         return new RequestData(
                 node,
-                keyboardFactory.getInlineKeyboardMarkup(node, version)
+                keyboardFactory.createInlineKeyboardMarkup(node, version)
         );
     }
 
@@ -228,7 +237,7 @@ public class TelegramService {
     }
 
     private final class KeyboardFactory {
-        InlineKeyboardMarkup getStartInlineKeyboardMarkupForWebApp(Long userId) {
+        InlineKeyboardMarkup createStartInlineKeyboardMarkupForWebApp(Long userId) {
             String address = this.buildWebAppAddress(userId);
             //TODO поменять текст на property
             InlineKeyboardButton webAppButton = new InlineKeyboardButton("Start").webApp(new WebAppInfo(address));
@@ -239,17 +248,17 @@ public class TelegramService {
             return "https://" + domain + "/story?user=" + userId;
         }
 
-        InlineKeyboardMarkup getInlineKeyboardMarkup(NodeWrapper node, Integer version) {
+        InlineKeyboardMarkup createInlineKeyboardMarkup(NodeWrapper node, Integer version) {
             InlineKeyboardMarkup keyboard = new InlineKeyboardMarkup();
             for (Button button : node.getButtons()) {
                 InlineKeyboardButton keyboardButton = new InlineKeyboardButton(button.getText());
-                keyboardButton.callbackData(this.buildCallbackData(button, node, version).toString());
+                keyboardButton.callbackData(this.formCallbackData(button, node, version).toString());
                 keyboard.addRow(keyboardButton);
             }
             return keyboard;
         }
 
-        CallbackData buildCallbackData(Button button, NodeWrapper node, Integer version) {
+        CallbackData formCallbackData(Button button, NodeWrapper node, Integer version) {
             return CallbackData.builder()
                     .nodeId(node.getNodeId())
                     .buttonId(button.getId())
@@ -258,18 +267,18 @@ public class TelegramService {
                     .build();
         }
 
-        InlineKeyboardMarkup getMarkedInlineKeyboardMarkup(NodeWrapper node, CallbackData callbackData) {
+        InlineKeyboardMarkup createMarkedInlineKeyboardMarkup(NodeWrapper node, CallbackData callbackData) {
             InlineKeyboardMarkup keyboard = new InlineKeyboardMarkup();
             for (Button button : node.getButtons()) {
-                InlineKeyboardButton keyboardButton = this.getMarkedKeyboardButton(button, node, callbackData);
+                InlineKeyboardButton keyboardButton = this.constructMarkedKeyboardButton(button, node, callbackData);
                 keyboardButton.callbackData("marked");
                 keyboard.addRow(keyboardButton);
             }
             return keyboard;
         }
 
-        InlineKeyboardButton getMarkedKeyboardButton(Button button, NodeWrapper node, CallbackData callbackData) {
-            if (this.buildCallbackData(button, node, callbackData.version).equals(callbackData))
+        InlineKeyboardButton constructMarkedKeyboardButton(Button button, NodeWrapper node, CallbackData callbackData) {
+            if (this.formCallbackData(button, node, callbackData.version).equals(callbackData))
                 return new InlineKeyboardButton(new String(Character.toChars(0x2705)) + button.getText());
             return new InlineKeyboardButton(button.getText());
         }

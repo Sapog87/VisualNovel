@@ -2,7 +2,7 @@ package com.sapog87.visual_novel.interpreter.handler.logical;
 
 import com.sapog87.visual_novel.app.entity.User;
 import com.sapog87.visual_novel.core.story.Story;
-import com.sapog87.visual_novel.core.story.nodes.IfElseStoryNode;
+import com.sapog87.visual_novel.core.story.nodes.logical.IfElseStoryNode;
 import com.sapog87.visual_novel.core.story.nodes.StoryNode;
 import com.sapog87.visual_novel.interpreter.data.Data;
 import com.sapog87.visual_novel.interpreter.handler.StoryNodeHandler;
