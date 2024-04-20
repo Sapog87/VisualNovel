@@ -15,15 +15,15 @@ import java.util.Objects;
 @Component
 public class Bot {
     private final TelegramBot bot;
-    private final BotService botService;
+    private final TelegramService telegramService;
 
-    public Bot(TelegramBot bot, BotService botService) {
+    public Bot(TelegramBot bot, TelegramService telegramService) {
         this.bot = bot;
-        this.botService = botService;
+        this.telegramService = telegramService;
     }
 
     public void start(String fileName) {
-        botService.start(fileName);
+        telegramService.start(fileName);
         this.botInit(bot);
         log.info("Bot was turned on");
     }
@@ -32,7 +32,7 @@ public class Bot {
         bot.setUpdatesListener(updates -> {
             updates.forEach(update -> {
                 UserMessage userMessage = this.getUserMessage(update);
-                botService.handleMessage(bot, userMessage);
+                telegramService.handleMessage(bot, userMessage);
             });
             return UpdatesListener.CONFIRMED_UPDATES_ALL;
         }, e -> {

@@ -24,9 +24,6 @@ public class User {
     @Column
     private String storyNodeId;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    private Message lastMessage;
-
     @Version
     private Integer version;
 

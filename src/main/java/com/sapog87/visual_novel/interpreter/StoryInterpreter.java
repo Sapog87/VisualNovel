@@ -73,19 +73,6 @@ public class StoryInterpreter {
         return this.proceed(telegramUserId, null, null, true);
     }
 
-    //TODO разобраться с транзакциями
-    @Transactional(dontRollbackOn = UserNotFoundException.class)
-    public void setLastMessageData(Long telegramUserId, MessageData data) {
-        log.info("Setting last message data for user {}", telegramUserId);
-        interpreterService.setLastMessageData(telegramUserId, data);
-    }
-
-    @Transactional(dontRollbackOn = UserNotFoundException.class)
-    public MessageData getLastMessageData(Long telegramUserId) {
-        log.info("Getting last message data for user {}", telegramUserId);
-        return interpreterService.getLastMessageData(telegramUserId);
-    }
-
     @Transactional(dontRollbackOn = UserNotFoundException.class)
     public Integer version(Long telegramUserId) {
         log.info("Getting version for user {}", telegramUserId);
