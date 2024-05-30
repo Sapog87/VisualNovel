@@ -27,6 +27,7 @@ import java.util.Objects;
 public class TelegramService {
     private final StoryInterpreter storyInterpreter;
     private final KeyboardFactory keyboardFactory;
+    private final TokenService tokenService;
     @Value("${domain}")
     private String domain;
     @Value("${story-location}")
@@ -36,8 +37,9 @@ public class TelegramService {
     @Value("${webapp-mode}")
     private Boolean useWebApp;
 
-    public TelegramService(StoryInterpreter storyInterpreter) {
+    public TelegramService(StoryInterpreter storyInterpreter, TokenService tokenService) {
         this.storyInterpreter = storyInterpreter;
+        this.tokenService = tokenService;
         this.keyboardFactory = new KeyboardFactory();
     }
 
@@ -65,7 +67,8 @@ public class TelegramService {
 
         this.markPressedButton(bot, userMessage.getMessage(), callbackData);
         this.sendChatAction(bot, userMessage.getUserId());
-        this.sendMessage(bot,
+        this.sendMessage(
+                bot,
                 userMessage.isStartFlag(),
                 userMessage.isRestartFlag(),
                 userMessage.getUserId(),
@@ -148,6 +151,8 @@ public class TelegramService {
     private RequestData handleWebAppCommandRequest(boolean restartFlag, Long userId) {
         if (restartFlag)
             storyInterpreter.restart(userId);
+        else
+            storyInterpreter.next(userId, null, null);
 
         return new RequestData(
                 //TODO поменять текст на property
@@ -245,7 +250,7 @@ public class TelegramService {
         }
 
         String buildWebAppAddress(Long userId) {
-            return "https://" + domain + "/story?user=" + userId;
+            return "https://" + domain + "/auth?token=" + tokenService.createToken(userId);
         }
 
         InlineKeyboardMarkup createInlineKeyboardMarkup(NodeWrapper node, Integer version) {

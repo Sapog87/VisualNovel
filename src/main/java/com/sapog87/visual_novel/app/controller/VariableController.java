@@ -6,9 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 @Controller
 public class VariableController {
@@ -17,9 +15,14 @@ public class VariableController {
 
     public VariableController(VariableService variableService) {this.variableService = variableService;}
 
-    @PostMapping("/change")
-    public @ResponseBody BooleanWrapper changeVariable(@RequestBody VariableDto variable) {
-        return new BooleanWrapper(variableService.change(variable));
+    @PostMapping("/variable")
+    public @ResponseBody BooleanWrapper changeVariable(@RequestParam String uid, @RequestBody VariableDto variable) {
+        return new BooleanWrapper(variableService.change(uid, variable));
+    }
+
+    @GetMapping("/variable")
+    public @ResponseBody VariableDto getVariable(@RequestParam String uid) {
+        return null;
     }
 
     @Getter

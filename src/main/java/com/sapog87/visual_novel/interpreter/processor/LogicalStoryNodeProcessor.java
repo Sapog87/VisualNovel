@@ -11,6 +11,6 @@ import java.util.Map;
 @Transactional
 public class LogicalStoryNodeProcessor extends Processor<String, LogicalStoryNode> {
     public LogicalStoryNodeProcessor(Map<String, StoryNodeHandler<String>> handlerMap) {
-        super(handlerMap, LogicalStoryNode.class);
+        super(handlerMap);
     }
 }

@@ -18,7 +18,7 @@ public class User {
     @Column(name = "id", nullable = false)
     private Long id;
 
-    @Column
+    @Column(unique = true, nullable = false)
     private Long externalUserId;
 
     @Column
@@ -30,4 +30,14 @@ public class User {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
     @MapKey(name = "name")
     private Map<String, Variable> variables;
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", externalUserId=" + externalUserId +
+                ", storyNodeId='" + storyNodeId + '\'' +
+                ", version=" + version +
+                '}';
+    }
 }

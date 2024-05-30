@@ -4,7 +4,8 @@ import com.sapog87.visual_novel.core.json.Connection;
 import com.sapog87.visual_novel.core.json.Node;
 import com.sapog87.visual_novel.core.json.Root;
 import com.sapog87.visual_novel.core.parser.SemanticType;
-import com.sapog87.visual_novel.core.story.nodes.*;
+import com.sapog87.visual_novel.core.story.nodes.StoryNode;
+import com.sapog87.visual_novel.core.story.nodes.StoryNodeType;
 import com.sapog87.visual_novel.core.story.nodes.terminal.EndStoryNode;
 import com.sapog87.visual_novel.core.story.nodes.terminal.StartStoryNode;
 import com.sapog87.visual_novel.core.story.nodes.variable.VariableInfo;
@@ -47,8 +48,9 @@ public class Story {
                         startNodeId = treeNode.getKey();
                     story.put(treeNode.getKey(), storyNode);
                 }
+            } else {
+                throw new IllegalArgumentException("Node with such id already exists {" + treeNode.getKey() + "}");
             }
-            throw new IllegalArgumentException("Node with such id already exists {" + treeNode.getKey() + "}");
         }
 
         this.toVariables(variableStoryNodes);

@@ -26,8 +26,8 @@ public abstract class SemanticCheckVisitor extends Visitor {
         }
         else if (expr instanceof BinaryExpr) {
             BinaryExpr binaryExpr = (BinaryExpr)expr;
-            var left = calcType(binaryExpr.left);
-            var right = calcType(binaryExpr.right);
+            var left = this.calcType(binaryExpr.left);
+            var right = this.calcType(binaryExpr.right);
 
             if (arithmeticOperations.contains(binaryExpr.op)) {
                 if ((left.equals(SemanticType.REAL) || left.equals(SemanticType.INT)) && (right.equals(SemanticType.REAL) || right.equals(SemanticType.INT))) {

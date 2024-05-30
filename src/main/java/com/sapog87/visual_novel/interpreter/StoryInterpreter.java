@@ -32,7 +32,10 @@ public class StoryInterpreter {
         this.terminalStoryNodeProcessor = terminalStoryNodeProcessor;
     }
 
+    //TODO сделать без new Story
     public void load(String path) {
+        if (story != null)
+            throw new IllegalArgumentException("Story already loaded");
         Root root = storyService.loadStoryFromFile(path);
         story = new Story(root);
     }

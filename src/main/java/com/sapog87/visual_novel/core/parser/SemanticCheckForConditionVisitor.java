@@ -14,7 +14,7 @@ public class SemanticCheckForConditionVisitor extends SemanticCheckVisitor {
 
     @Override
     void visitBinaryExpr(BinaryExpr binaryExpr) {
-        var type = calcType(binaryExpr);
+        var type = this.calcType(binaryExpr);
         if (!type.equals(SemanticType.BOOL)) {
             throw new IllegalArgumentException("found {" + type + "} expected {Bool}");
         }
@@ -22,7 +22,7 @@ public class SemanticCheckForConditionVisitor extends SemanticCheckVisitor {
 
     @Override
     void visitId(Id id) {
-        var type = calcType(id);
+        var type = this.calcType(id);
         if (!type.equals(SemanticType.BOOL)) {
             throw new IllegalArgumentException("found {" + type + "} expected {Bool}");
         }

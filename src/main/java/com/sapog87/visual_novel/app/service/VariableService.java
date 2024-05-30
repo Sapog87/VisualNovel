@@ -13,7 +13,7 @@ public class VariableService {
 
     public VariableService(VariableRepository variableRepository) {this.variableRepository = variableRepository;}
 
-    public Boolean change(VariableDto variableDto) {
+    public Boolean change(String uid, VariableDto variableDto) {
         Variable variable = variableRepository.findByName(variableDto.getName());
 
         if (variable == null)
