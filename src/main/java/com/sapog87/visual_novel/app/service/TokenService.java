@@ -54,7 +54,6 @@ public class TokenService {
 
     public User getUserFromToken(String token) {
         Token tokenEntity = tokenRepository.findByToken(token);
-        log.info(tokenEntity.toString());
         return userRepository.findUserByExternalUserId(tokenEntity.getUser().getExternalUserId()).orElseThrow(UserNotFoundException::new);
     }
 }

@@ -26,7 +26,7 @@ public final class Bot {
 
     public void start(String fileName) {
         telegramService.start(fileName);
-//        this.botInit(bot);
+        this.botInit(bot);
         log.info("Bot was turned on");
     }
 

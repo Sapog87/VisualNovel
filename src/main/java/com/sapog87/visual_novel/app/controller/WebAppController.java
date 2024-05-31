@@ -31,7 +31,6 @@ public class WebAppController {
 
     @GetMapping("/story")
     public String nextNode(Model model, @RequestParam("user") String user, @RequestParam(value = "node", required = false) String node, @RequestParam(value = "data", required = false) String data, HttpServletRequest request) {
-        System.out.println(request.getUserPrincipal());
         if (!useWebApp || !request.getUserPrincipal().getName().equals(user)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
