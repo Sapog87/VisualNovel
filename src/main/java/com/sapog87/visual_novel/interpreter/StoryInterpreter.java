@@ -16,6 +16,9 @@ import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import java.util.function.Function;
+import java.util.function.Supplier;
+
 @Slf4j
 @Component
 public class StoryInterpreter {
@@ -33,11 +36,11 @@ public class StoryInterpreter {
     }
 
     //TODO сделать без new Story
-    public void load(String path) {
+    public void load(String path, Function<Root, Story> storyFunction) {
         if (story != null)
             throw new IllegalArgumentException("Story already loaded");
         Root root = storyService.loadStoryFromFile(path);
-        story = new Story(root);
+        story = storyFunction.apply(root);
     }
 
     public NodeWrapper getNode(String nodeId) {

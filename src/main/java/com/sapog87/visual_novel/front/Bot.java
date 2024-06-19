@@ -4,14 +4,19 @@ import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.UpdatesListener;
 import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.model.Update;
+import com.pengrad.telegrambot.request.SendMessage;
 import com.sapog87.visual_novel.app.service.TelegramService;
+import com.sapog87.visual_novel.core.json.Root;
+import com.sapog87.visual_novel.core.story.Story;
 import com.sapog87.visual_novel.front.adapter.UserMessage;
 import com.sapog87.visual_novel.interpreter.data.Data;
 import com.sapog87.visual_novel.interpreter.data.UserData;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import java.awt.*;
 import java.util.Objects;
+import java.util.function.Function;
 
 @Slf4j
 @Component
@@ -24,8 +29,8 @@ public final class Bot {
         this.telegramService = telegramService;
     }
 
-    public void start(String fileName) {
-        telegramService.start(fileName);
+    public void start(String fileName, Function<Root, Story> storyFunction) {
+        telegramService.start(fileName, storyFunction);
         this.botInit(bot);
         log.info("Bot was turned on");
     }
@@ -34,7 +39,15 @@ public final class Bot {
         bot.setUpdatesListener(updates -> {
             updates.forEach(update -> {
                 UserMessage userMessage = this.getUserMessage(update);
-                telegramService.handleMessage(bot, userMessage);
+                try {
+                    telegramService.handleMessage(bot, userMessage);
+                } catch (Exception ignored) {
+                    try {
+                        bot.execute(new SendMessage(update.message().chat().id(), "Что-то пошло не так"));
+                    } catch (Exception e) {
+                        bot.execute(new SendMessage(update.callbackQuery().message().chat().id(), "Что-то пошло не так"));
+                    }
+                }
             });
             return UpdatesListener.CONFIRMED_UPDATES_ALL;
         }, e -> {
@@ -50,7 +63,7 @@ public final class Bot {
     private UserMessage getUserMessage(Update update) {
         if (Objects.nonNull(update.message())) {
             return this.handleMessage(update);
-        } else if (Objects.nonNull(update.callbackQuery()) && !update.callbackQuery().data().equals("inactive")) {
+        } else if (Objects.nonNull(update.callbackQuery()) && !update.callbackQuery().data().equals("marked")) {
             return this.handleCallback(update);
         } else {
             return null;
@@ -58,6 +71,8 @@ public final class Bot {
     }
 
     private UserMessage handleMessage(Update update) {
+        if (update.message().text() == null)
+            return null;
         var builder = UserMessage.builder();
         Long userId = update.message().from().id();
         builder.userId(userId);

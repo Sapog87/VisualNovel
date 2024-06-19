@@ -1,0 +1,33 @@
+version: "3"
+
+services:
+  vn:
+    image: visual_novel_service_image
+    container_name: visual_novel_service
+    build: .
+    restart: always
+    ports:
+      - "443:443"
+    env_file:
+      - service.env
+    networks:
+      - vn_net
+
+  db:
+    container_name: visual_novel_db
+    image: postgres:16.2
+    restart: always
+    ports:
+      - "5432"
+    volumes:
+      - vn_db_volume:/var/lib/postgresql/vn_db_volume
+    env_file:
+      - db.env
+    networks:
+      - vn_net
+
+volumes:
+  vn_db_volume:
+
+networks:
+  vn_net:

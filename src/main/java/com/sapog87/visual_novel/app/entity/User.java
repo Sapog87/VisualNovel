@@ -11,7 +11,7 @@ import java.util.Map;
 @Getter
 @Setter
 @NoArgsConstructor
-@Table(name = "`user`", indexes = @Index(columnList = "externalUserId"))
+@Table(name = "tg_user", indexes = @Index(columnList = "externalUserId"))
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)

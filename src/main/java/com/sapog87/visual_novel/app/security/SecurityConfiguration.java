@@ -31,6 +31,7 @@ public class SecurityConfiguration {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http, TokenAuthenticationFilter tokenAuthenticationFilter) throws Exception {
         http
+                .csrf(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorize ->
                         authorize
@@ -55,7 +56,7 @@ public class SecurityConfiguration {
     public UserDetailsService userDetailsService() {
         UserDetails user = User
                 .withUsername("admin")
-                .password("$2a$10$qIBXcA6pz4xinGFnnufBTOYg7Tc7c8LMUaiJ1saF8ckY3m4J8xBEO")
+                .password("$2a$12$Mj3x8V0I.ew7t.SLua85VuI.JuCPnty7tir32c9KbABZwUM0EDUgC")
                 .authorities("ADMIN")
                 .build();
 

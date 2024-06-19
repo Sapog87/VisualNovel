@@ -8,6 +8,8 @@ import com.pengrad.telegrambot.model.request.InlineKeyboardButton;
 import com.pengrad.telegrambot.model.request.InlineKeyboardMarkup;
 import com.pengrad.telegrambot.request.*;
 import com.sapog87.visual_novel.app.exception.UserNotFoundException;
+import com.sapog87.visual_novel.core.json.Root;
+import com.sapog87.visual_novel.core.story.Story;
 import com.sapog87.visual_novel.front.adapter.Button;
 import com.sapog87.visual_novel.front.adapter.NodeWrapper;
 import com.sapog87.visual_novel.front.adapter.UserMessage;
@@ -21,6 +23,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.util.Objects;
+import java.util.function.Function;
 
 @Slf4j
 @Service
@@ -43,7 +46,7 @@ public class TelegramService {
         this.keyboardFactory = new KeyboardFactory();
     }
 
-    public void start(String fileName) {
+    public void start(String fileName, Function<Root, Story> storyFunction) {
         log.info("Web app mode: {}", useWebApp);
         if (useWebApp) {
             if (domain == null || domain.isBlank())
@@ -52,7 +55,7 @@ public class TelegramService {
         }
         log.info("Story location: {}", storyLocation);
         log.info("Pictures-location: {}", picturesLocation);
-        storyInterpreter.load(storyLocation + fileName);
+        storyInterpreter.load(storyLocation + fileName, storyFunction);
     }
 
     @Transactional(dontRollbackOn = UserNotFoundException.class)
