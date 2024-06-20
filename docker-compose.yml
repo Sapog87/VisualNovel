@@ -13,6 +13,7 @@ services:
       - ./pictures:/pictures
       - ./static:/static
       - ./cert:/cert
+      - ./templates:/templates
     env_file:
       - service.env
     networks:
