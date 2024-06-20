@@ -3,9 +3,6 @@ do
     case "${flag}" in
         s) remote_server=${OPTARG};;
         k) ssh_key=${OPTARG};;
-        t) vn_image=${OPTARG};;
-        v) vn_container=${OPTARG};;
-        d) db_container=${OPTARG};;
     esac
 done
 
@@ -37,19 +34,4 @@ for program_name in "${programs[@]}"; do
     fi
 done
 
-if [ ! -z "${vn_image}" ]
-then
-    ssh $remote_server -i $ssh_key "docker image rm $vn_image"
-fi
-
-if [ ! -z "${vn_container}" ]
-then
-    ssh $remote_server -i $ssh_key "docker rm -f $vn_container"
-fi
-
-if [ ! -z "${db_container}" ]
-then
-    ssh $remote_server -i $ssh_key "docker rm -f $db_container"
-fi
-
-ssh $remote_server -i $ssh_key "cd vn; docker image rm visual_novel_service_image; docker-compose build; docker-compose up -d"
+ssh $remote_server -i $ssh_key "cd vn; docker-compose down; docker-compose up --build -d"
